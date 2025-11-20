@@ -63,6 +63,26 @@ cogames leaderboard
 cogames version
 ```
 
+Let’s walk through playing an easy mission in Cogs vs. Clips, then training a simple starter policy. The shortcut `easy_mode` uses the map evals.extractor_hub_30 with several variants: 
+- `lonely_heart`: Making hearts for one agent is easy.  
+- `heart_chorus`: Heart-centric reward shaping with gentle resource bonuses.                                                                            
+- `pack_rat`: Raise heart, cargo, energy, and gear inventory caps to 255.
+
+```bash
+# Play an episode yourself
+cogames tutorial
+
+# Play an episode of an easy mission with a scripted policy with GUI
+cogames play -m easy_mode -p baseline
+
+# Try the scripted policy on a set of eval missions
+cogames eval -set integrated_evals -p lstm
+
+# Train a starter policy on this easy mission
+cogames train -m easy_mode -p lstm
+```
+
+
 ## Play, Train, and Eval
 
 Most commands are of the form `cogames <command> -m [MISSION] -p [POLICY] [OPTIONS]`
