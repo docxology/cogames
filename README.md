@@ -216,7 +216,7 @@ for step in range(1000):
 
 ### `cogames eval -m [MISSION] [-m MISSION...] -p POLICY [-p POLICY...]`
 
-Evaluate one or more policies on one or more missions. 
+Evaluate one or more policies on one or more missions. Initiates 4 cogs by default.
 
 We provide a set of eval missions which you can use instead of missions `-m`. Specify `-set` or `-S` among: `eval_missions`, `integrated_evals`, `spanning_evals`, `diagnostic_evals`, `all`.
 
