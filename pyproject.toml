@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "cogames"
 description = "Multi-agent cooperative games"
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.12,<3.14"
 dependencies = [
   "heavyball>=2.0.0",
   "mettagrid",
@@ -26,6 +26,13 @@ dynamic = ["version"]
 
 [project.scripts]
 cogames = "cogames.main:app"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4.0",
+  "pytest-cov>=4.1.0",
+  "pytest-xdist>=3.5.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -51,9 +58,6 @@ pythonpath = ["src"]
 testpaths = ["tests"]
 [tool.coverage.run]
 source = ["cogames"]
-
-[tool.uv.sources]
-mettagrid = { workspace = true }
 
 [tool.uv]
 cache-keys = [
