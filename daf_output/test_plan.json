@@ -1,0 +1,12 @@
+{
+  "timestamp": "2025-11-22T20:32:50Z",
+  "phase1": {
+    "total": 185,
+    "suites": [{"name": "CLI Tests", "file": "tests/test_cli.py", "expected": 6},{"name": "Core Game Tests", "file": "tests/test_cogs_vs_clips.py", "expected": 4},{"name": "CVC Assembler Hearts Tests", "file": "tests/test_cvc_assembler_hearts.py", "expected": 2},{"name": "Procedural Maps Tests", "file": "tests/test_procedural_maps.py", "expected": 11},{"name": "Scripted Policies Tests", "file": "tests/test_scripted_policies.py", "expected": 13},{"name": "Train Integration Tests", "file": "tests/test_train_integration.py", "expected": 2},{"name": "Train Vector Alignment Tests", "file": "tests/test_train_vector_alignment.py", "expected": 5},{"name": "All Games Describe Tests", "file": "tests/test_all_games_describe.py", "expected": 47},{"name": "All Games Eval Tests", "file": "tests/test_all_games_eval.py", "expected": 48},{"name": "All Games Play Tests", "file": "tests/test_all_games_play.py", "expected": 47}]
+  },
+  "phase2": {
+    "total": 100,
+    "suites": [{"name": "Configuration Tests", "file": "daf/tests/test_config.py", "expected": 15},{"name": "Environment Check Tests", "file": "daf/tests/test_environment_checks.py", "expected": 13},{"name": "Sweep Tests", "file": "daf/tests/test_sweeps.py", "expected": 16},{"name": "Comparison Tests", "file": "daf/tests/test_comparison.py", "expected": 12},{"name": "Deployment Tests", "file": "daf/tests/test_deployment.py", "expected": 11},{"name": "Distributed Training Tests", "file": "daf/tests/test_distributed_training.py", "expected": 12},{"name": "Visualization Tests", "file": "daf/tests/test_visualization.py", "expected": 9},{"name": "Mission Analysis Tests", "file": "daf/tests/test_mission_analysis.py", "expected": 12}]
+  },
+  "grand_total": 285
+}

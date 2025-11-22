@@ -1,0 +1,64 @@
+[2025-11-22 12:38:57] [INFO] root - ✓ test_deployment_result_creation PASSED (0.000s)
+[2025-11-22 12:38:57] [INFO] daf.deployment - Packaging policy: cogames.policy.scripted_agent.baseline_agent.BaselinePolicy
+[2025-11-22 12:38:57] [INFO] root - ✓ test_daf_package_policy PASSED (0.004s)
+[2025-11-22 12:38:57] [INFO] daf.deployment - Packaging policy: cogames.policy.scripted_agent.baseline_agent.BaselinePolicy
+[2025-11-22 12:38:57] [INFO] root - ✓ test_daf_package_policy_with_weights PASSED (0.002s)
+[2025-11-22 12:38:57] [INFO] daf.deployment - Packaging policy: cogames.policy.scripted_agent.baseline_agent.BaselinePolicy
+[2025-11-22 12:38:57] [INFO] root - ✓ test_daf_package_policy_nonexistent_weights PASSED (0.001s)
+[2025-11-22 12:38:57] [INFO] daf.tests.fixtures - Loading mission: training_facility_1
+[2025-11-22 12:38:57] [INFO] root - ⏭ test_daf_validate_deployment SKIPPED (0.249s)
+[2025-11-22 12:38:58] [INFO] root - ✓ test_daf_validate_deployment_no_missions PASSED (0.549s)
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - connect_tcp.started host='example.com' port=443 local_address=None timeout=30.0 socket_options=None
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11afec7a0>
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x11b05a850> server_hostname='example.com' timeout=30.0
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11af93c20>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'POST']>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_headers.complete
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'POST']>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_body.complete
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'POST']>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 403, b'Forbidden', [(b'Mime-Version', b'1.0'), (b'Content-Type', b'text/html'), (b'Content-Length', b'375'), (b'Cache-Control', b'max-age=86000'), (b'Date', b'Sat, 22 Nov 2025 20:38:58 GMT'), (b'Connection', b'close'), (b'Alt-Svc', b'h3=":443"; ma=93600')])
+[2025-11-22 12:38:58] [INFO] httpx - HTTP Request: POST https://example.com/api/upload "HTTP/1.1 403 Forbidden"
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'POST']>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - receive_response_body.complete
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - response_closed.started
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - response_closed.complete
+[2025-11-22 12:38:58] [INFO] root - ✓ test_daf_deploy_policy_simulation_mode PASSED (0.321s)
+[2025-11-22 12:38:58] [INFO] root - ✓ test_daf_deploy_policy_nonexistent_package PASSED (0.001s)
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - connect_tcp.started host='example.com' port=443 local_address=None timeout=10.0 socket_options=None
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11b0e4680>
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x1074f3450> server_hostname='example.com' timeout=10.0
+[2025-11-22 12:38:58] [DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11b0e4530>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'GET']>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_headers.complete
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'GET']>
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - send_request_body.complete
+[2025-11-22 12:38:58] [DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'GET']>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 404, b'Not Found', [(b'Accept-Ranges', b'bytes'), (b'Content-Type', b'text/html'), (b'ETag', b'"bc2473a18e003bdb249eba5ce893033f:1760028122.592274"'), (b'Last-Modified', b'Thu, 09 Oct 2025 16:42:02 GMT'), (b'Server', b'AkamaiNetStorage'), (b'Content-Length', b'513'), (b'Expires', b'Sat, 22 Nov 2025 20:38:59 GMT'), (b'Cache-Control', b'max-age=0, no-cache, no-store'), (b'Pragma', b'no-cache'), (b'Date', b'Sat, 22 Nov 2025 20:38:59 GMT'), (b'Connection', b'keep-alive'), (b'Alt-Svc', b'h3=":443"; ma=93600')])
+[2025-11-22 12:38:59] [INFO] httpx - HTTP Request: GET https://example.com/api/status/test_id "HTTP/1.1 404 Not Found"
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'GET']>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_body.complete
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - response_closed.started
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - response_closed.complete
+[2025-11-22 12:38:59] [DEBUG] httpcore.connection - close.started
+[2025-11-22 12:38:59] [DEBUG] httpcore.connection - close.complete
+[2025-11-22 12:38:59] [INFO] root - ✓ test_daf_monitor_deployment_simulation PASSED (0.272s)
+[2025-11-22 12:38:59] [DEBUG] httpcore.connection - connect_tcp.started host='example.com' port=443 local_address=None timeout=30.0 socket_options=None
+[2025-11-22 12:38:59] [DEBUG] httpcore.connection - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11b0e5be0>
+[2025-11-22 12:38:59] [DEBUG] httpcore.connection - start_tls.started ssl_context=<ssl.SSLContext object at 0x10a0220d0> server_hostname='example.com' timeout=30.0
+[2025-11-22 12:38:59] [DEBUG] httpcore.connection - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x11b0e5ac0>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - send_request_headers.started request=<Request [b'POST']>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - send_request_headers.complete
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - send_request_body.started request=<Request [b'POST']>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - send_request_body.complete
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_headers.started request=<Request [b'POST']>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_headers.complete return_value=(b'HTTP/1.1', 403, b'Forbidden', [(b'Mime-Version', b'1.0'), (b'Content-Type', b'text/html'), (b'Content-Length', b'393'), (b'Cache-Control', b'max-age=86000'), (b'Date', b'Sat, 22 Nov 2025 20:38:59 GMT'), (b'Connection', b'close'), (b'Alt-Svc', b'h3=":443"; ma=93600')])
+[2025-11-22 12:38:59] [INFO] httpx - HTTP Request: POST https://example.com/api/rollback/test_id "HTTP/1.1 403 Forbidden"
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_body.started request=<Request [b'POST']>
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - receive_response_body.complete
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - response_closed.started
+[2025-11-22 12:38:59] [DEBUG] httpcore.http11 - response_closed.complete
+[2025-11-22 12:38:59] [INFO] root - ✓ test_daf_rollback_deployment_simulation PASSED (0.242s)
+[2025-11-22 12:38:59] [INFO] daf.deployment - Packaging policy: cogames.policy.scripted_agent.baseline_agent.BaselinePolicy
+[2025-11-22 12:38:59] [INFO] daf.tests.fixtures - Loading mission: training_facility_1
+[2025-11-22 12:38:59] [INFO] root - ⏭ test_package_and_validate_workflow SKIPPED (0.003s)

@@ -17,7 +17,6 @@ from rich.console import Console
 
 from cogames.cli.mission import get_mission
 from cogames.play import play as play_episode
-from metta.common.util.log_config import init_mettagrid_system_environment
 from mettagrid.config.mettagrid_config import EnvSupervisorConfig
 from mettagrid.envs.mettagrid_puffer_env import MettaGridPufferEnv
 from mettagrid.policy.loader import discover_and_register_policies
@@ -25,7 +24,6 @@ from mettagrid.policy.policy import PolicySpec
 from mettagrid.simulator import Simulator
 
 discover_and_register_policies("cogames.policy")
-init_mettagrid_system_environment()
 
 
 @dataclass(frozen=True)

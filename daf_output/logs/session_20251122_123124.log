@@ -1,0 +1,17 @@
+[2025-11-22 12:31:24] [INFO] root - ✓ test_environment_check_result PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_environment_check_result_is_healthy PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_environment_check_result_summary PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_cuda_availability PASSED (0.000s)
+[2025-11-22 12:31:24] [DEBUG] matplotlib - matplotlib data path: /opt/homebrew/lib/python3.13/site-packages/matplotlib/mpl-data
+[2025-11-22 12:31:24] [DEBUG] matplotlib - CONFIGDIR=/Users/4d/.matplotlib
+[2025-11-22 12:31:24] [DEBUG] matplotlib - interactive is False
+[2025-11-22 12:31:24] [DEBUG] matplotlib - platform is darwin
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_dependencies PASSED (0.081s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_disk_space PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_disk_space_insufficient PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_get_recommended_device PASSED (0.001s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_environment_all_checks PASSED (0.001s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_environment_selective PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_daf_check_environment_no_checks PASSED (0.000s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_full_environment_validation PASSED (0.001s)
+[2025-11-22 12:31:24] [INFO] root - ✓ test_environment_suitable_for_training PASSED (0.001s)

@@ -1,0 +1,15 @@
+[2025-11-22 12:36:49] [INFO] root - ✓ test_policy_comparison_result_creation PASSED (0.000s)
+[2025-11-22 12:36:49] [INFO] root - ✓ test_policy_comparison_result_summary PASSED (0.000s)
+[2025-11-22 12:36:49] [INFO] root - ✓ test_comparison_report_creation PASSED (0.000s)
+[2025-11-22 12:36:49] [INFO] root - ✓ test_comparison_report_add_policy_results PASSED (0.001s)
+[2025-11-22 12:36:49] [INFO] root - ✓ test_comparison_report_summary_statistics PASSED (0.000s)
+[2025-11-22 12:36:50] [INFO] root - ✓ test_comparison_report_compute_pairwise_comparisons PASSED (0.934s)
+[2025-11-22 12:36:50] [INFO] root - ✓ test_comparison_report_save_json PASSED (0.001s)
+[2025-11-22 12:36:50] [INFO] daf.tests.fixtures - Loading mission: training_facility_1
+[2025-11-22 12:36:50] [INFO] root - ⏭ test_daf_compare_policies_with_real_mission SKIPPED (0.067s)
+[2025-11-22 12:36:50] [INFO] daf.comparison - Validating comparison inputs: 1 policies, 13 missions
+[2025-11-22 12:38:56] [INFO] root - ✓ test_daf_benchmark_suite PASSED (126.372s)
+[2025-11-22 12:38:56] [INFO] root - ✓ test_comparison_report_pairwise_comparisons_empty PASSED (0.000s)
+[2025-11-22 12:38:56] [INFO] root - ✓ test_comparison_report_pairwise_comparisons_single_policy PASSED (0.000s)
+[2025-11-22 12:38:56] [INFO] daf.tests.fixtures - Loading mission: training_facility_1
+[2025-11-22 12:38:56] [INFO] root - ⏭ test_comparison_workflow SKIPPED (0.000s)

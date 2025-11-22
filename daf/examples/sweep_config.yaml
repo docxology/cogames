@@ -1,0 +1,52 @@
+# DAF Hyperparameter Sweep Configuration Example
+# 
+# This configuration defines a hyperparameter search over LSTM policy
+# learning rates and hidden sizes using grid search.
+#
+# Usage: cogames daf-sweep --config sweep_config.yaml
+
+name: "lstm_hyperparameter_grid_search"
+description: "Grid search over LSTM learning rates and hidden sizes"
+
+# Missions to evaluate on
+missions:
+  - "training_facility_1"
+  - "training_facility_2"
+
+# Policy to optimize
+policy_class_path: "cogames.policy.lstm.LSTMPolicy"
+
+# Search strategy: "grid", "random", or "bayesian"
+strategy: "grid"
+
+# Parameter search space
+# For grid search: each value is a list of values to test
+# For random search: each value is a (min, max) tuple
+search_space:
+  learning_rate:
+    - 0.0001
+    - 0.0005
+    - 0.001
+  hidden_size:
+    - 64
+    - 128
+    - 256
+
+# Number of trials (for random/Bayesian strategies only)
+num_trials: 9
+
+# Evaluation settings
+episodes_per_trial: 3
+max_steps_per_episode: 1000
+seed: 42
+
+# Optimization objective
+objective_metric: "avg_reward_per_agent"
+optimize_direction: "maximize"
+
+# Save best N configurations
+checkpoint_best_n: 3
+
+
+
+

@@ -1,0 +1,187 @@
+{
+  "generated": "2025-11-22T12:39:02.862643",
+  "phase1": [
+    {
+      "suite": "All Games Describe",
+      "status": "PASSED",
+      "tests": 47,
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 60.72
+    },
+    {
+      "suite": "All Games Eval",
+      "status": "PASSED",
+      "tests": 48,
+      "passed": 48,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 77.1
+    },
+    {
+      "suite": "All Games Play",
+      "status": "PASSED",
+      "tests": 47,
+      "passed": 47,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 65.37
+    },
+    {
+      "suite": "Cli",
+      "status": "PASSED",
+      "tests": 6,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 8.63
+    },
+    {
+      "suite": "Cogs Vs Clips",
+      "status": "PASSED",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.21
+    },
+    {
+      "suite": "Cvc Assembler Hearts",
+      "status": "PASSED",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.15
+    },
+    {
+      "suite": "Procedural Maps",
+      "status": "PASSED",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 2.63
+    },
+    {
+      "suite": "Scripted Policies",
+      "status": "PASSED",
+      "tests": 13,
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 1.05
+    },
+    {
+      "suite": "Train Integration",
+      "status": "PASSED",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 15.67
+    },
+    {
+      "suite": "Train Vector Alignment",
+      "status": "PASSED",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.77
+    }
+  ],
+  "phase2": [
+    {
+      "suite": "Comparison",
+      "status": "PASSED",
+      "tests": 12,
+      "passed": 10,
+      "failed": 0,
+      "skipped": 2,
+      "errors": 0,
+      "duration": 128.13
+    },
+    {
+      "suite": "Config",
+      "status": "PASSED",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.06
+    },
+    {
+      "suite": "Deployment",
+      "status": "PASSED",
+      "tests": 11,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 2,
+      "errors": 0,
+      "duration": 1.69
+    },
+    {
+      "suite": "Distributed Training",
+      "status": "PASSED",
+      "tests": 12,
+      "passed": 11,
+      "failed": 0,
+      "skipped": 1,
+      "errors": 0,
+      "duration": 0.82
+    },
+    {
+      "suite": "Environment Checks",
+      "status": "PASSED",
+      "tests": 13,
+      "passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.7
+    },
+    {
+      "suite": "Mission Analysis",
+      "status": "PASSED",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.24
+    },
+    {
+      "suite": "Sweeps",
+      "status": "PASSED",
+      "tests": 16,
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 0.71
+    },
+    {
+      "suite": "Visualization",
+      "status": "PASSED",
+      "tests": 9,
+      "passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "errors": 0,
+      "duration": 1.04
+    }
+  ]
+}

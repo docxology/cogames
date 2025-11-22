@@ -1,0 +1,13 @@
+[2025-11-21 08:54:52] [INFO] root - ✓ test_distributed_training_result_creation PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_distributed_training_result_training_rate PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_create_training_cluster_single_node PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_create_training_cluster_multi_node PASSED (0.001s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_aggregate_training_stats PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_aggregate_training_stats_sum PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_aggregate_training_stats_max PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_aggregate_training_stats_empty PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_daf_get_training_status PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] daf.tests.fixtures - Loading mission: training_facility_1
+[2025-11-21 08:54:52] [INFO] root - ⏭ test_daf_launch_distributed_training_single_node SKIPPED (0.057s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_training_cluster_creation_workflow PASSED (0.000s)
+[2025-11-21 08:54:52] [INFO] root - ✓ test_stats_aggregation_workflow PASSED (0.000s)

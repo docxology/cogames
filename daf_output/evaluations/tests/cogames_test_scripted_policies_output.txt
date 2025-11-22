@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.11, pytest-9.0.1, pluggy-1.6.0 -- /Users/4d/Documents/GitHub/cogames/.venv/bin/python
+cachedir: .pytest_cache
+rootdir: /Users/4d/Documents/GitHub/cogames
+configfile: pyproject.toml
+plugins: anyio-4.11.0, xdist-3.8.0, asyncio-1.3.0, cov-7.0.0
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 13 items
+
+tests/test_scripted_policies.py::test_scripted_policies_work_as_supervisors[nim_thinky] PASSED [  7%]
+tests/test_scripted_policies.py::test_scripted_policies_work_as_supervisors[nim_random] PASSED [ 15%]
+tests/test_scripted_policies.py::test_scripted_policies_work_as_supervisors[nim_race_car] PASSED [ 23%]
+tests/test_scripted_policies.py::test_scripted_policies_work_as_supervisors[nim_agents_agents_ThinkyAgentsMultiPolicy] PASSED [ 30%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[nim_thinky] PASSED [ 38%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[nim_random] PASSED [ 46%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[nim_race_car] PASSED [ 53%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[scripted_baseline] PASSED [ 61%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[scripted_unclipping] PASSED [ 69%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[scripted_starter] PASSED [ 76%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[nim_agents_agents_ThinkyAgentsMultiPolicy] PASSED [ 84%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[scripted_agent_baseline_agent_BaselinePolicy] PASSED [ 92%]
+tests/test_scripted_policies.py::test_scripted_policies_can_play_short_episode[scripted_agent_starter_agent_StarterPolicy] PASSED [100%]
+
+============================== 13 passed in 1.05s ==============================
