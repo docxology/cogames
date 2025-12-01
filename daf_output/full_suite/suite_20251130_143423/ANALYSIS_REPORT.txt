@@ -1,0 +1,75 @@
+================================================================================
+DAF FULL SUITE - COMPREHENSIVE ANALYSIS REPORT
+================================================================================
+Generated: 2025-11-30 14:37:13
+Policy: BaselinePolicy (cogames.policy.scripted_agent.baseline_agent)
+
+--------------------------------------------------------------------------------
+EXECUTIVE SUMMARY
+--------------------------------------------------------------------------------
+
+Total Sweep Trials:      36
+Successful Trials:       3 (8.3%)
+Comparison Episodes:     20
+
+--------------------------------------------------------------------------------
+MISSION: HELLO_WORLD
+--------------------------------------------------------------------------------
+
+Sweep Results:
+  Trials:        18
+  Success Rate:  5.6%
+  Best Reward:   2.00
+  Mean Reward:   0.1111
+  Std Dev:       0.4581
+
+Best Configuration:
+  seed: 123
+  max_steps_fraction: 1.0
+  actual_max_steps: 1000
+
+Performance by Max Steps Fraction:
+  0.50x: avg=0.000, success=0%
+  0.75x: avg=0.000, success=0%
+  1.00x: avg=0.333, success=17%
+
+--------------------------------------------------------------------------------
+MISSION: MACHINA_1
+--------------------------------------------------------------------------------
+
+Sweep Results:
+  Trials:        18
+  Success Rate:  11.1%
+  Best Reward:   1.00
+  Mean Reward:   0.1111
+  Std Dev:       0.3143
+
+Best Configuration:
+  seed: 789
+  max_steps_fraction: 1.0
+  actual_max_steps: 1000
+
+Performance by Max Steps Fraction:
+  0.50x: avg=0.000, success=0%
+  0.75x: avg=0.000, success=0%
+  1.00x: avg=0.333, success=33%
+
+--------------------------------------------------------------------------------
+KEY INSIGHTS
+--------------------------------------------------------------------------------
+
+1. EPISODE LENGTH:
+   Full-length episodes (1.0x) are required for reward collection.
+   Shorter episodes consistently fail to achieve any rewards.
+
+2. MISSION DIFFICULTY:
+   HelloWorld has achievable rewards with correct configuration.
+   Machina requires more sophisticated policies or longer training.
+
+3. SEED SENSITIVITY:
+   Performance varies significantly across random seeds.
+   Multiple seeds should be tested for robust evaluation.
+
+================================================================================
+END OF REPORT
+================================================================================

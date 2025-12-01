@@ -58,7 +58,7 @@ def test_training_pipeline_environment_check_ordering(tmp_path):
 
     result = daf_run_training_pipeline(
         policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
-        mission_names=["training_facility_1"],
+        mission_names=["hello_world.open_world"],
         num_training_steps=10,  # Very small for testing
         checkpoints_path=tmp_path,
         console=console,
@@ -77,7 +77,7 @@ def test_training_pipeline_stage_ordering(tmp_path):
     """Verify training pipeline has correct stage ordering."""
     result = daf_run_training_pipeline(
         policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
-        mission_names=["training_facility_1"],
+        mission_names=["hello_world.open_world"],
         num_training_steps=10,
         checkpoints_path=tmp_path,
     )
@@ -94,11 +94,11 @@ def test_training_pipeline_stage_ordering(tmp_path):
 
 def test_sweep_pipeline_environment_check_ordering(tmp_path):
     """Verify sweep pipeline has environment check as Stage 1."""
-    from src.config import DAFSweepConfig
+    from daf.src.config import DAFSweepConfig
 
     sweep_config = DAFSweepConfig(
         name="test_sweep",
-        missions=["training_facility_1"],
+        missions=["hello_world.open_world"],
         policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
         search_space={"x": [1, 2]},
         strategy="grid",
@@ -118,11 +118,11 @@ def test_sweep_pipeline_environment_check_ordering(tmp_path):
 
 def test_sweep_pipeline_stage_ordering(tmp_path):
     """Verify sweep pipeline has correct stage ordering."""
-    from src.config import DAFSweepConfig
+    from daf.src.config import DAFSweepConfig
 
     sweep_config = DAFSweepConfig(
         name="test_sweep",
-        missions=["training_facility_1"],
+        missions=["hello_world.open_world"],
         policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
         search_space={"x": [1]},  # Single config for speed
         strategy="grid",
@@ -156,8 +156,8 @@ def test_comparison_pipeline_environment_check_ordering(tmp_path):
         from typer import Context
 
         ctx = Context(lambda: None)
-        _, env_cfg, _ = get_mission_name_and_config(ctx, "training_facility_1")
-        missions = [("training_facility_1", env_cfg)]
+        _, env_cfg, _ = get_mission_name_and_config(ctx, "hello_world.open_world")
+        missions = [("hello_world.open_world", env_cfg)]
 
         policy_specs = [
             PolicySpec(class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy")
@@ -190,8 +190,8 @@ def test_comparison_pipeline_stage_ordering(tmp_path):
         from typer import Context
 
         ctx = Context(lambda: None)
-        _, env_cfg, _ = get_mission_name_and_config(ctx, "training_facility_1")
-        missions = [("training_facility_1", env_cfg)]
+        _, env_cfg, _ = get_mission_name_and_config(ctx, "hello_world.open_world")
+        missions = [("hello_world.open_world", env_cfg)]
 
         policy_specs = [
             PolicySpec(class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy")
@@ -293,7 +293,7 @@ class TestOrchestratorIntegration:
         """Test complete training pipeline workflow."""
         result = daf_run_training_pipeline(
             policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
-            mission_names=["training_facility_1"],
+            mission_names=["hello_world.open_world"],
             num_training_steps=10,
             checkpoints_path=tmp_path,
         )
@@ -304,11 +304,11 @@ class TestOrchestratorIntegration:
 
     def test_sweep_pipeline_with_minimal_config(self, tmp_path):
         """Test sweep pipeline with minimal configuration."""
-        from src.config import DAFSweepConfig
+        from daf.src.config import DAFSweepConfig
 
         sweep_config = DAFSweepConfig(
             name="minimal_test",
-            missions=["training_facility_1"],
+            missions=["hello_world.open_world"],
             policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
             search_space={"x": [1]},
             strategy="grid",
@@ -329,18 +329,18 @@ class TestOrchestratorIntegration:
         # Training pipeline
         train_result = daf_run_training_pipeline(
             policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
-            mission_names=["training_facility_1"],
+            mission_names=["hello_world.open_world"],
             num_training_steps=10,
             checkpoints_path=tmp_path,
         )
         assert "environment_check" in (train_result.stages_completed + train_result.stages_failed)
 
         # Sweep pipeline
-        from src.config import DAFSweepConfig
+        from daf.src.config import DAFSweepConfig
 
         sweep_config = DAFSweepConfig(
             name="test",
-            missions=["training_facility_1"],
+            missions=["hello_world.open_world"],
             policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
             search_space={"x": [1]},
             strategy="grid",

@@ -62,12 +62,21 @@ class EnvironmentCheckResult:
         self.errors.append(f"{name}: {error_msg}")
 
     def is_healthy(self) -> bool:
-        """Check if environment is healthy (all checks passed).
+        """Check if environment is healthy (no critical errors).
 
         Returns:
-            True if all checks passed, False otherwise
+            True if no critical errors, False otherwise.
+            Warnings (CUDA, optional packages) don't affect health status.
         """
-        return all(self.checks.values()) and not self.errors
+        return not self.errors
+
+    def is_fully_optimal(self) -> bool:
+        """Check if environment is fully optimal (all checks passed).
+
+        Returns:
+            True if all checks passed and no warnings/errors
+        """
+        return all(self.checks.values()) and not self.errors and not self.warnings
 
     def summary(self) -> str:
         """Generate summary string of check results.
@@ -234,16 +243,17 @@ def daf_check_dependencies(console: Optional[Console] = None) -> EnvironmentChec
 
     result = EnvironmentCheckResult()
 
-    required_packages = [
-        "torch",
-        "numpy",
-        "pydantic",
-        "pyyaml",
-        "typer",
-        "rich",
-        "mettagrid",
-        "pufferlib",
-    ]
+    # Package name -> import name mapping (for packages where they differ)
+    required_packages = {
+        "torch": "torch",
+        "numpy": "numpy",
+        "pydantic": "pydantic",
+        "pyyaml": "yaml",  # PyYAML is imported as yaml
+        "typer": "typer",
+        "rich": "rich",
+        "mettagrid": "mettagrid",
+        "pufferlib": "pufferlib",
+    }
 
     optional_packages = [
         "ray",  # For distributed training
@@ -253,9 +263,9 @@ def daf_check_dependencies(console: Optional[Console] = None) -> EnvironmentChec
     ]
 
     # Check required packages
-    for package_name in required_packages:
+    for package_name, import_name in required_packages.items():
         try:
-            importlib.import_module(package_name)
+            importlib.import_module(import_name)
             result.add_check(f"Required: {package_name}", True, info="Available")
         except ImportError:
             result.add_error(f"Required Package: {package_name}", "Not installed or not importable")
@@ -284,7 +294,7 @@ def daf_check_mission_configs(missions: list[str], console: Optional[Console] = 
     """Validate mission configurations can be loaded.
 
     Args:
-        missions: List of mission names or paths
+        missions: List of mission names in format 'site.mission' (e.g., 'training_facility.open_world')
         console: Optional Rich console for output
 
     Returns:
@@ -293,18 +303,46 @@ def daf_check_mission_configs(missions: list[str], console: Optional[Console] = 
     if console is None:
         console = Console()
 
-    from cogames.cli.mission import get_mission_name_and_config
-
     result = EnvironmentCheckResult()
 
     for mission_name in missions:
         try:
-            # Try to load the mission
-            from typer import Context
-
-            ctx = Context(lambda: None)
-            _ = get_mission_name_and_config(ctx, mission_name)
-            result.add_check(f"Mission: {mission_name}", True, info="Loadable")
+            # Parse site.mission format and load directly from mission module
+            if "." in mission_name:
+                from cogames.cogs_vs_clips.missions import MISSIONS
+                
+                # Find mission by checking both name and full_name
+                site_name, mission_part = mission_name.split(".", 1)
+                found = False
+                for m in MISSIONS:
+                    # Check various name formats
+                    if hasattr(m, 'full_name') and m.full_name == mission_name:
+                        found = True
+                        break
+                    if hasattr(m, 'name') and m.name == mission_part:
+                        # Check if site matches
+                        if hasattr(m, 'site') and hasattr(m.site, 'name') and m.site.name == site_name:
+                            found = True
+                            break
+                
+                if found:
+                    result.add_check(f"Mission: {mission_name}", True, info="Loadable")
+                else:
+                    result.add_error(f"Mission: {mission_name}", f"Not found in MISSIONS")
+            else:
+                # Legacy format - try direct name match
+                from cogames.cogs_vs_clips.missions import MISSIONS
+                
+                found = any(
+                    (hasattr(m, 'name') and m.name == mission_name) or
+                    (hasattr(m, 'full_name') and m.full_name == mission_name)
+                    for m in MISSIONS
+                )
+                if found:
+                    result.add_check(f"Mission: {mission_name}", True, info="Loadable")
+                else:
+                    result.add_error(f"Mission: {mission_name}", f"Not found in MISSIONS")
+                    
         except Exception as e:
             result.add_error(f"Mission: {mission_name}", str(e))
 

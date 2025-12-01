@@ -1,0 +1,316 @@
+{
+  "sweep_name": "machina_1_sweep",
+  "objective_metric": "total_reward",
+  "optimize_direction": "maximize",
+  "start_time": "2025-11-30T14:35:05.249495",
+  "end_time": "2025-11-30T14:36:05.349503",
+  "num_trials": 18,
+  "trials": [
+    {
+      "trial_id": 1,
+      "hyperparameters": {
+        "seed": 42,
+        "max_steps_fraction": 0.5,
+        "actual_max_steps": 500
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:09.284367"
+    },
+    {
+      "trial_id": 2,
+      "hyperparameters": {
+        "seed": 42,
+        "max_steps_fraction": 0.75,
+        "actual_max_steps": 750
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:13.560106"
+    },
+    {
+      "trial_id": 3,
+      "hyperparameters": {
+        "seed": 42,
+        "max_steps_fraction": 1.0,
+        "actual_max_steps": 1000
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:16.043256"
+    },
+    {
+      "trial_id": 4,
+      "hyperparameters": {
+        "seed": 123,
+        "max_steps_fraction": 0.5,
+        "actual_max_steps": 500
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:17.944177"
+    },
+    {
+      "trial_id": 5,
+      "hyperparameters": {
+        "seed": 123,
+        "max_steps_fraction": 0.75,
+        "actual_max_steps": 750
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:20.156423"
+    },
+    {
+      "trial_id": 6,
+      "hyperparameters": {
+        "seed": 123,
+        "max_steps_fraction": 1.0,
+        "actual_max_steps": 1000
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:25.004799"
+    },
+    {
+      "trial_id": 7,
+      "hyperparameters": {
+        "seed": 456,
+        "max_steps_fraction": 0.5,
+        "actual_max_steps": 500
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:27.525568"
+    },
+    {
+      "trial_id": 8,
+      "hyperparameters": {
+        "seed": 456,
+        "max_steps_fraction": 0.75,
+        "actual_max_steps": 750
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:30.210401"
+    },
+    {
+      "trial_id": 9,
+      "hyperparameters": {
+        "seed": 456,
+        "max_steps_fraction": 1.0,
+        "actual_max_steps": 1000
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:33.515662"
+    },
+    {
+      "trial_id": 10,
+      "hyperparameters": {
+        "seed": 789,
+        "max_steps_fraction": 0.5,
+        "actual_max_steps": 500
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:36.881894"
+    },
+    {
+      "trial_id": 11,
+      "hyperparameters": {
+        "seed": 789,
+        "max_steps_fraction": 0.75,
+        "actual_max_steps": 750
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:40.665069"
+    },
+    {
+      "trial_id": 12,
+      "hyperparameters": {
+        "seed": 789,
+        "max_steps_fraction": 1.0,
+        "actual_max_steps": 1000
+      },
+      "primary_metric": 1.0,
+      "all_metrics": {
+        "total_reward": 1.0
+      },
+      "mission_results": {
+        "machina_1": 1.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:44.755278"
+    },
+    {
+      "trial_id": 13,
+      "hyperparameters": {
+        "seed": 1000,
+        "max_steps_fraction": 0.5,
+        "actual_max_steps": 500
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:47.372218"
+    },
+    {
+      "trial_id": 14,
+      "hyperparameters": {
+        "seed": 1000,
+        "max_steps_fraction": 0.75,
+        "actual_max_steps": 750
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:49.485351"
+    },
+    {
+      "trial_id": 15,
+      "hyperparameters": {
+        "seed": 1000,
+        "max_steps_fraction": 1.0,
+        "actual_max_steps": 1000
+      },
+      "primary_metric": 1.0,
+      "all_metrics": {
+        "total_reward": 1.0
+      },
+      "mission_results": {
+        "machina_1": 1.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:53.660134"
+    },
+    {
+      "trial_id": 16,
+      "hyperparameters": {
+        "seed": 2000,
+        "max_steps_fraction": 0.5,
+        "actual_max_steps": 500
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:35:56.274785"
+    },
+    {
+      "trial_id": 17,
+      "hyperparameters": {
+        "seed": 2000,
+        "max_steps_fraction": 0.75,
+        "actual_max_steps": 750
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:36:00.830232"
+    },
+    {
+      "trial_id": 18,
+      "hyperparameters": {
+        "seed": 2000,
+        "max_steps_fraction": 1.0,
+        "actual_max_steps": 1000
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {
+        "machina_1": 0.0
+      },
+      "success": true,
+      "timestamp": "2025-11-30T14:36:05.349288"
+    }
+  ]
+}

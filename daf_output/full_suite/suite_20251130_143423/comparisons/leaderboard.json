@@ -1,0 +1,12 @@
+{
+  "generated": "2025-11-30T14:37:12.381146",
+  "leaderboard": [
+    {
+      "rank": 1,
+      "policy": "BaselinePolicy",
+      "avg_reward": 0.25,
+      "std_dev": 0.6224949798994366,
+      "missions_evaluated": 2
+    }
+  ]
+}
