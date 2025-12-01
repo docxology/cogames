@@ -125,16 +125,39 @@ Container for environment check results.
 
 ### Functions
 
+#### `daf_check_gpu_availability(console=None) → EnvironmentCheckResult`
+
+Platform-aware GPU verification. Checks MPS on macOS (Apple Silicon), CUDA on Linux/Windows.
+
+```python
+from daf.environment_checks import daf_check_gpu_availability
+
+result = daf_check_gpu_availability()
+if result.is_healthy():
+    print("GPU available:", result.info.get("device"))
+    # On macOS: "MPS (Apple Silicon)"
+    # On Linux/Windows: "CUDA" with device count
+```
+
+**Platform Detection:**
+- **macOS**: Checks MPS (Metal Performance Shaders) for Apple Silicon GPUs
+- **Linux/Windows**: Checks CUDA for NVIDIA GPUs
+
+**Returns:**
+- `EnvironmentCheckResult` with GPU backend info in `result.info["gpu_backend"]`
+
 #### `daf_check_cuda_availability(console=None) → EnvironmentCheckResult`
 
-Verify GPU/CUDA setup using cogames.device patterns.
+Legacy function for CUDA-only check. **Deprecated**: Use `daf_check_gpu_availability()` instead.
+
+Now internally calls `daf_check_gpu_availability()` for platform-aware detection.
 
 ```python
 from daf.environment_checks import daf_check_cuda_availability
 
 result = daf_check_cuda_availability()
 if not result.is_healthy():
-    print("CUDA issues detected")
+    print("GPU issues detected")
 ```
 
 #### `daf_check_disk_space(checkpoint_dir, min_available_gb=10.0) → EnvironmentCheckResult`
@@ -158,16 +181,34 @@ from daf.environment_checks import daf_check_environment
 
 result = daf_check_environment(
     missions=["training_facility_1"],
-    check_cuda=True,
+    check_cuda=True,  # Actually checks GPU (MPS or CUDA based on platform)
     check_disk=True
 )
+
+# Check results
+print(result.summary())  # "Environment Check: HEALTHY (16/16 checks passed)"
 ```
+
+**Checks Performed:**
+- GPU availability (MPS on macOS, CUDA on Linux/Windows)
+- Disk space for checkpoints
+- Required package dependencies
+- Mission configuration loading
 
 #### `daf_get_recommended_device() → torch.device`
 
-Get recommended device (CUDA if available, else CPU). **Uses `cogames.device.resolve_training_device()`** internally.
+Get recommended device for training. Returns MPS on Apple Silicon, CUDA on NVIDIA systems, CPU otherwise.
 
-**Integration**: Wraps `cogames.device.resolve_training_device()` with DAF-specific environment checks.
+```python
+from daf.environment_checks import daf_get_recommended_device
+
+device = daf_get_recommended_device()
+# Returns: torch.device("mps") on Apple Silicon
+#          torch.device("cuda") on NVIDIA
+#          torch.device("cpu") otherwise
+```
+
+**Integration**: Wraps `cogames.device.resolve_training_device()` with DAF-specific environment checks and informative console output.
 
 ## Distributed Training Module (`daf.distributed_training`)
 
@@ -296,8 +337,8 @@ Results from comparing two policies.
 **Attributes:**
 - `policy_a_name`: First policy name
 - `policy_b_name`: Second policy name
-- `avg_reward_a`: Average reward for policy A
-- `avg_reward_b`: Average reward for policy B
+- `avg_reward_a`: Average reward/score for policy A
+- `avg_reward_b`: Average reward/score for policy B
 - `p_value`: Statistical significance p-value
 - `is_significant`: Whether difference is significant
 - `effect_size`: Cohen's d effect size
@@ -313,14 +354,17 @@ Complete report from multi-policy comparison.
 - `add_policy_results(policy_name, mission_rewards)`: Add policy results
 - `compute_pairwise_comparisons(significance_level=0.05)`: Run statistical tests
 - `print_summary(console)`: Print to console
-- `save_json(path)`: Save to JSON file
+- `save_json(path)`: Save to JSON file (includes `detailed_metrics` if available)
+
+**Attributes:**
+- `policy_detailed_metrics`: Dict of policy → mission → agent metrics (resources, actions, etc.)
 
 **Properties:**
 - `summary_statistics`: Dict of policy statistics
 
 ### Functions
 
-#### `daf_compare_policies(policies, missions, episodes_per_mission=5) → ComparisonReport`
+#### `daf_compare_policies(policies, missions, episodes_per_mission=5, use_performance_score=True) → ComparisonReport`
 
 Compare multiple policies on given missions. **Uses `cogames.evaluate.evaluate()`** internally for evaluation.
 
@@ -329,13 +373,32 @@ from daf.comparison import daf_compare_policies
 from mettagrid.policy.policy import PolicySpec
 
 policies = [
-    PolicySpec(class_path="cogames.policy.lstm.LSTMPolicy"),
-    PolicySpec(class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy")
+    PolicySpec(class_path="lstm"),
+    PolicySpec(class_path="baseline")
 ]
 missions = [("training_facility_1", env_cfg)]
 
 report = daf_compare_policies(policies, missions)
+print(report.summary_statistics)
+# {'baseline': {'avg_reward': 6168.60, 'std_dev': 0.0}, 'random': {'avg_reward': 1206.42, 'std_dev': 0.0}}
+
+# Access detailed metrics
+print(report.policy_detailed_metrics['baseline']['training_facility_1'])
+# {'carbon.gained': 50.0, 'energy.gained': 5525.0, 'action.move.success': 2607.5, ...}
 ```
+
+**Parameters:**
+- `policies`: List of PolicySpec objects to compare
+- `missions`: List of (mission_name, env_config) tuples
+- `episodes_per_mission`: Episodes to run per mission (default: 5)
+- `use_performance_score`: If True, compute composite performance score from agent metrics when raw rewards are 0 (default: True)
+
+**Performance Score Computation:**
+When environments return zero rewards, DAF computes a meaningful performance score from agent metrics:
+- Resources gained (carbon, silicon, oxygen, germanium, energy)
+- Inventory diversity (weighted higher)
+- Successful actions (movement)
+- Penalties for failures and being stuck
 
 **Integration**: Invokes `cogames.evaluate.evaluate()` for policy evaluation, then adds statistical analysis and reporting.
 
@@ -365,17 +428,75 @@ from daf.visualization import daf_plot_policy_comparison
 daf_plot_policy_comparison(comparison_report)
 ```
 
+**Generated Files:**
+- `policy_rewards_comparison.png` - Bar chart of overall performance
+- `performance_by_mission.png` - Grouped bars per mission
+- `reward_distributions.png` - Violin plots of score distributions
+
+#### `daf_plot_detailed_metrics_comparison(comparison_report, output_dir="comparison_plots")`
+
+Generate detailed agent metric comparison plots from ComparisonReport with `policy_detailed_metrics`.
+
+```python
+from daf.visualization import daf_plot_detailed_metrics_comparison
+
+# Requires comparison_report to have policy_detailed_metrics populated
+daf_plot_detailed_metrics_comparison(comparison_report, output_dir="comparisons/")
+```
+
+**Generated Files:**
+- `metrics_resources_gained.png` - Bar chart: carbon, silicon, oxygen, germanium gained
+- `metrics_resources_held.png` - Bar chart: current resource amounts
+- `metrics_energy.png` - Bar chart: energy amount, gained, lost
+- `metrics_actions.png` - Bar chart: move success/fail, noop, change_vibe
+- `metrics_inventory.png` - Bar chart: inventory diversity metrics
+- `metrics_radar.png` - Radar chart: key metrics comparison
+- `action_distribution.png` - Pie charts: action type distribution per policy
+
+**Metric Categories Plotted:**
+- **Resources Gained**: carbon.gained, silicon.gained, oxygen.gained, germanium.gained
+- **Resources Held**: carbon.amount, silicon.amount, oxygen.amount, germanium.amount
+- **Energy**: energy.amount, energy.gained, energy.lost
+- **Actions**: action.move.success, action.move.failed, action.noop.success, action.change_vibe.success
+- **Inventory**: inventory.diversity, inventory.diversity.ge.2, etc.
+
 #### `daf_plot_sweep_results(sweep_result, output_dir="sweep_plots")`
 
 Generate plots from sweep results.
 
+**Generated Files:**
+- `sweep_progress.png` - Trial performance over time
+- `best_configuration.png` - Best hyperparameter configuration
+- `hyperparameter_importance.png` - Correlation with performance
+
+#### `daf_plot_sweep_heatmap(sweep_result, hp_x, hp_y, output_path)`
+
+Generate performance heatmap across two hyperparameters.
+
+#### `daf_plot_sweep_parallel_coordinates(sweep_result, output_path)`
+
+Generate parallel coordinates plot for hyperparameter exploration.
+
 #### `daf_export_comparison_html(comparison_report, output_path="report.html")`
 
-Export comparison report as interactive HTML.
+Export comparison report as interactive HTML. Includes detailed metrics tables when `policy_detailed_metrics` is available.
+
+**HTML Sections:**
+- Summary statistics with rankings
+- Pairwise statistical comparisons
+- Detailed agent metrics tables (Resources, Energy, Actions, Inventory, Status)
 
 #### `daf_generate_leaderboard(comparison_report, output_path=None) → str`
 
 Generate policy leaderboard table in Markdown format.
+
+#### `daf_generate_summary_dashboard(sweep_result=None, comparison_report=None, output_dir="dashboard")`
+
+Generate comprehensive dashboard with multiple visualizations.
+
+**Generated Files:**
+- `dashboard.html` - Interactive summary dashboard
+- All sweep/comparison plots in subdirectories
 
 ## Deployment Module (`daf.deployment`)
 

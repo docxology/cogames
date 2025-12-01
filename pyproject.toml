@@ -22,6 +22,7 @@ dependencies = [
   "uvicorn>=0.34.0",
   "httpx>=0.28.1",
   "matplotlib",
+  "ray",
 ]
 dynamic = ["version"]
 

@@ -337,18 +337,21 @@ def daf_launch_sweep(
         optimize_direction=sweep_config.optimize_direction,
     )
 
-    # Load missions
-    from cogames.cli.mission import get_mission_names_and_configs
+    # Load missions using get_mission directly (avoids typer.Context dependency)
+    from cogames.cli.mission import get_mission
 
     try:
-        from typer import Context
-
-        ctx = Context(lambda: None)
-        missions_and_configs = get_mission_names_and_configs(ctx, sweep_config.missions)
+        missions_and_configs = []
+        for mission_name in sweep_config.missions:
+            name, env_cfg, _ = get_mission(mission_name)
+            missions_and_configs.append((name, env_cfg))
     except Exception as e:
         console.print(f"[red]Error loading missions: {e}[/red]")
         raise
 
+    # Import performance score computation from comparison module
+    from daf.src.comparison import _compute_performance_score
+    
     # Evaluate each configuration
     for trial_id, config in enumerate(configs, 1):
         console.print(f"[cyan]Trial {trial_id}/{len(configs)}: {config}[/cyan]")
@@ -369,13 +372,44 @@ def daf_launch_sweep(
             )
 
             # Extract primary metric from results
+            # summaries is a list per mission, each with per_episode_per_policy_avg_rewards
+            # Structure: per_episode_per_policy_avg_rewards[episode_idx] = [reward_policy_0, reward_policy_1, ...]
             primary_metric = 0.0
+            all_rewards = []
+            mission_results = {}
+            
             if summaries:
-                mission_summary = summaries[0]
-                if hasattr(mission_summary, "per_episode_per_policy_avg_rewards"):
-                    rewards = mission_summary.per_episode_per_policy_avg_rewards.get(0, [])
-                    if rewards:
-                        primary_metric = float(np.mean([r for r in rewards if r is not None]))
+                for mission_idx, mission_summary in enumerate(summaries):
+                    mission_name = missions_and_configs[mission_idx][0] if mission_idx < len(missions_and_configs) else f"mission_{mission_idx}"
+                    mission_reward = 0.0
+                    
+                    # First try explicit rewards
+                    has_nonzero_rewards = False
+                    if hasattr(mission_summary, "per_episode_per_policy_avg_rewards"):
+                        for episode_idx, rewards_per_policy in mission_summary.per_episode_per_policy_avg_rewards.items():
+                            # We only have one policy per trial, so take index 0
+                            if rewards_per_policy and rewards_per_policy[0] is not None:
+                                reward = float(rewards_per_policy[0])
+                                all_rewards.append(reward)
+                                mission_reward += reward
+                                if reward != 0.0:
+                                    has_nonzero_rewards = True
+                    
+                    # If rewards are zero, compute performance score from agent metrics
+                    if not has_nonzero_rewards:
+                        if hasattr(mission_summary, "policy_summaries") and mission_summary.policy_summaries:
+                            ps = mission_summary.policy_summaries[0]  # First policy
+                            if hasattr(ps, "avg_agent_metrics") and ps.avg_agent_metrics:
+                                performance_score = _compute_performance_score(ps.avg_agent_metrics)
+                                # Replace zero rewards with performance score
+                                all_rewards = [performance_score] * len(all_rewards) if all_rewards else [performance_score]
+                                mission_reward = performance_score
+                                logger.info(f"Trial {trial_id}: Using performance score for {mission_name}: {performance_score:.2f}")
+                    
+                    mission_results[mission_name] = mission_reward
+                
+                if all_rewards:
+                    primary_metric = float(np.mean(all_rewards))
 
             # Record trial result
             trial = SweepTrialResult(
@@ -383,7 +417,7 @@ def daf_launch_sweep(
                 hyperparameters=config,
                 primary_metric=primary_metric,
                 all_metrics={sweep_config.objective_metric: primary_metric},
-                mission_results={m[0]: primary_metric for m in missions_and_configs},
+                mission_results=mission_results,
                 success=primary_metric > 0,
             )
 

@@ -95,14 +95,29 @@ class EnvironmentCheckResult:
         Returns:
             List of actionable recommendations
         """
+        import platform
+        is_macos = platform.system() == "Darwin"
         recommendations = []
         
-        # CUDA recommendations
-        if "CUDA Available" in self.checks and not self.checks["CUDA Available"]:
-            recommendations.append(
-                "CUDA not available. For GPU training, ensure PyTorch CUDA support is installed: "
-                "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118"
-            )
+        # GPU recommendations - platform-specific
+        if is_macos:
+            # MPS recommendations for macOS
+            if "MPS Backend" in self.checks and not self.checks["MPS Backend"]:
+                recommendations.append(
+                    "MPS backend not built. Reinstall PyTorch with MPS support: "
+                    "pip install torch torchvision torchaudio"
+                )
+            elif "MPS Available" in self.checks and not self.checks["MPS Available"]:
+                recommendations.append(
+                    "MPS not available. Ensure you're on Apple Silicon (M1/M2/M3) Mac with macOS 12.3+."
+                )
+        else:
+            # CUDA recommendations for Linux/Windows
+            if "CUDA Available" in self.checks and not self.checks["CUDA Available"]:
+                recommendations.append(
+                    "CUDA not available. For GPU training, ensure PyTorch CUDA support is installed: "
+                    "pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118"
+                )
         
         # Disk space recommendations
         if "Disk Space" in self.checks and not self.checks["Disk Space"]:
@@ -120,25 +135,89 @@ class EnvironmentCheckResult:
         return recommendations
 
 
-def daf_check_cuda_availability(console: Optional[Console] = None) -> EnvironmentCheckResult:
-    """Verify GPU/CUDA setup using cogames.device patterns.
+def _is_macos() -> bool:
+    """Check if running on macOS."""
+    import platform
+    return platform.system() == "Darwin"
+
+
+def daf_check_gpu_availability(console: Optional[Console] = None) -> EnvironmentCheckResult:
+    """Verify GPU setup: CUDA on Linux/Windows, MPS on macOS.
 
     Args:
         console: Optional Rich console for output
 
     Returns:
-        EnvironmentCheckResult with CUDA availability status
+        EnvironmentCheckResult with GPU availability status
     """
     if console is None:
         console = Console()
 
     result = EnvironmentCheckResult()
+    is_macos = _is_macos()
 
+    if is_macos:
+        # macOS: Check MPS (Metal Performance Shaders) backend
+        return _check_mps_availability(result, console)
+    else:
+        # Linux/Windows: Check CUDA backend
+        return _check_cuda_availability(result, console)
+
+
+def _check_mps_availability(result: EnvironmentCheckResult, console: Console) -> EnvironmentCheckResult:
+    """Check MPS (Metal) GPU availability on macOS.
+
+    Args:
+        result: EnvironmentCheckResult to populate
+        console: Rich console for output
+
+    Returns:
+        Updated EnvironmentCheckResult
+    """
+    try:
+        mps_built = torch.backends.mps.is_built()
+        mps_available = torch.backends.mps.is_available()
+
+        if not mps_built:
+            result.add_check("MPS Backend", False, warning="MPS backend not built into PyTorch")
+            result.info["device"] = "CPU only"
+            console.print("[yellow]⚠ MPS not built - will use CPU[/yellow]")
+            return result
+
+        result.add_check("MPS Backend", True, info="Built")
+
+        if mps_available:
+            result.add_check("MPS Available", True, info="Apple Silicon GPU ready")
+            result.info["device"] = "MPS (Apple Silicon)"
+            result.info["gpu_backend"] = "Metal Performance Shaders"
+            console.print("[green]✓ MPS (Apple Silicon GPU) available[/green]")
+        else:
+            result.add_check("MPS Available", False, warning="MPS built but not available on this device")
+            result.info["device"] = "CPU"
+            console.print("[yellow]⚠ MPS not available on this Mac - will use CPU[/yellow]")
+
+    except Exception as e:
+        result.add_error("MPS Check", str(e))
+
+    return result
+
+
+def _check_cuda_availability(result: EnvironmentCheckResult, console: Console) -> EnvironmentCheckResult:
+    """Check CUDA GPU availability on Linux/Windows.
+
+    Args:
+        result: EnvironmentCheckResult to populate
+        console: Rich console for output
+
+    Returns:
+        Updated EnvironmentCheckResult
+    """
     # Check if CUDA backend is available
     cuda_backend = getattr(torch.backends, "cuda", None)
     if cuda_backend is None or not cuda_backend.is_built():
         result.add_check("CUDA Backend", False, warning="CUDA backend not built into PyTorch")
         result.info["device"] = "CPU only"
+        console.print("[yellow]⚠ CUDA not built - will use CPU[/yellow]")
         return result
 
     # Check if cuda device count function exists
@@ -154,6 +233,7 @@ def daf_check_cuda_availability(console: Optional[Console] = None) -> Environmen
         if cuda_available:
             device_count = torch.cuda.device_count()
             result.info["device_count"] = str(device_count)
+            result.info["gpu_backend"] = "CUDA"
 
             # Check each device
             for i in range(device_count):
@@ -173,6 +253,21 @@ def daf_check_cuda_availability(console: Optional[Console] = None) -> Environmen
         result.add_error("CUDA Check", str(e))
 
     return result
+
+
+# Backward compatibility alias
+def daf_check_cuda_availability(console: Optional[Console] = None) -> EnvironmentCheckResult:
+    """Verify GPU setup (CUDA or MPS depending on platform).
+
+    Deprecated: Use daf_check_gpu_availability() instead.
+
+    Args:
+        console: Optional Rich console for output
+
+    Returns:
+        EnvironmentCheckResult with GPU availability status
+    """
+    return daf_check_gpu_availability(console)
 
 
 def daf_check_disk_space(
@@ -386,13 +481,13 @@ def daf_check_environment(
 
     combined_result = EnvironmentCheckResult()
 
-    # Check CUDA
+    # Check GPU (CUDA on Linux/Windows, MPS on macOS)
     if check_cuda:
-        cuda_result = daf_check_cuda_availability(console)
-        for name, passed in cuda_result.checks.items():
+        gpu_result = daf_check_gpu_availability(console)
+        for name, passed in gpu_result.checks.items():
             combined_result.checks[name] = passed
-        combined_result.warnings.extend(cuda_result.warnings)
-        combined_result.errors.extend(cuda_result.errors)
+        combined_result.warnings.extend(gpu_result.warnings)
+        combined_result.errors.extend(gpu_result.errors)
 
     # Check disk space
     if check_disk:
@@ -446,10 +541,10 @@ def daf_check_environment(
 
 
 def daf_get_recommended_device(console: Optional[Console] = None) -> torch.device:
-    """Get recommended device for training (CUDA if available, else CPU).
+    """Get recommended device for training (CUDA/MPS if available, else CPU).
 
     Uses cogames.device.resolve_training_device pattern but with DAF-specific
-    environment checks.
+    environment checks. On macOS, prefers MPS (Metal). On Linux/Windows, prefers CUDA.
 
     Args:
         console: Optional Rich console for output
@@ -462,5 +557,15 @@ def daf_get_recommended_device(console: Optional[Console] = None) -> torch.devic
     if console is None:
         console = Console()
 
-    return resolve_training_device(console, "auto")
+    device = resolve_training_device(console, "auto")
+    
+    # Provide informative message about the selected device
+    if _is_macos() and device.type == "mps":
+        console.print("[green]✓ Using MPS (Apple Silicon GPU) for acceleration[/green]")
+    elif device.type == "cuda":
+        console.print(f"[green]✓ Using CUDA GPU for acceleration[/green]")
+    else:
+        console.print("[yellow]ℹ Using CPU (no GPU acceleration)[/yellow]")
+    
+    return device
 

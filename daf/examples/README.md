@@ -1,5 +1,44 @@
 # DAF Examples
 
+## Quick Start
+
+```bash
+# Run full evaluation suite with GIF visualization
+./daf/scripts/run_full_suite.sh --with-gif
+
+# Generate GIF from existing replay
+python daf/examples/gif_visualization_example.py --replay path/to/replay.json.z
+
+# Quick comparison run
+python daf/scripts/run_full_suite.py --quick --policies baseline random
+```
+
+## GIF Visualization
+
+The DAF module now supports animated GIF generation from simulation replays:
+
+```bash
+# Generate GIF with custom settings
+python daf/examples/gif_visualization_example.py \
+    --mission hello_world.easy_hearts \
+    --policy baseline \
+    --fps 10 \
+    --cell-size 16
+
+# Generate individual frames (for video creation)
+python daf/examples/gif_visualization_example.py --frames-only
+```
+
+### Creating Videos with FFmpeg
+
+```bash
+# Convert frames to MP4
+ffmpeg -framerate 10 -pattern_type glob -i 'frames/*.png' \
+       -c:v libx264 -pix_fmt yuv420p output.mp4
+```
+
+---
+
 Example configurations and scripts demonstrating DAF usage with different policy types and workflows.
 
 ## Example Files
@@ -10,9 +49,77 @@ examples/
 ├── comparison_config.yaml           # Multi-policy comparison setup
 ├── pipeline_config.yaml             # End-to-end workflow orchestration
 └── output_management_example.py     # Output management and logging
+
+scripts/
+├── run_full_suite.py                # Full cogames runs with visualizations
+├── run_full_suite.sh                # Shell wrapper for full suite
+├── run_daf_tests.sh                 # Unit test runner
+└── run_all_tests.sh                 # All tests orchestration
 ```
 
-## Quick Start
+---
+
+## 🚀 Full Evaluation Suite (Recommended)
+
+The **full suite script** runs real CoGames evaluations with comprehensive visualizations.
+
+### Quick Start
+
+```bash
+# Quick evaluation (3 episodes, fast)
+./daf/scripts/run_full_suite.sh --quick
+
+# Standard evaluation
+./daf/scripts/run_full_suite.sh
+
+# Custom policies
+./daf/scripts/run_full_suite.sh --policies lstm baseline random
+
+# Multiple missions
+./daf/scripts/run_full_suite.sh --missions training_facility_1 assembler_2
+```
+
+### What It Does
+
+1. **Environment Validation** - Checks missions and dependencies
+2. **Policy Comparison** - Evaluates multiple policies with statistics
+3. **Hyperparameter Sweep** - Grid search over policy parameters
+4. **Dashboard Generation** - Creates interactive HTML visualizations
+
+### Output Structure
+
+```
+daf_output/full_suite/suite_YYYYMMDD_HHMMSS/
+├── comparisons/
+│   ├── report.html                  # Interactive comparison report
+│   ├── policy_rewards_comparison.png
+│   ├── performance_by_mission.png
+│   └── leaderboard.json
+├── sweeps/baseline/
+│   ├── sweep_progress.png           # Trial performance over time
+│   ├── heatmap.png                  # Parameter heatmap
+│   ├── parallel.png                 # Parallel coordinates
+│   └── best_configuration.png
+├── dashboard/
+│   └── dashboard.html               # Summary dashboard
+├── SUITE_SUMMARY.json
+└── SUITE_SUMMARY.txt
+```
+
+### Options
+
+| Option | Description |
+|--------|-------------|
+| `--quick` | Fast mode (3 episodes) |
+| `--policies P1 P2...` | Policies to evaluate |
+| `--missions M1 M2...` | Missions to run on |
+| `--episodes N` | Episodes per mission |
+| `--no-sweep` | Skip hyperparameter sweep |
+| `--sweep-policy P` | Policy for sweep (default: baseline) |
+
+---
+
+## Quick Start (Individual Examples)
 
 ### Example 1: Hyperparameter Sweep
 
@@ -429,6 +536,7 @@ episodes_per_trial: 1
 - `../README.md` - DAF overview
 - `../src/README.md` - Source modules
 - `../../README.md` - CoGames overview
+
 
 
 

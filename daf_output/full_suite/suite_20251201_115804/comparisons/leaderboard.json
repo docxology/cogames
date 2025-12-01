@@ -1,0 +1,19 @@
+{
+  "generated": "2025-12-01T11:58:30.143237",
+  "leaderboard": [
+    {
+      "rank": 1,
+      "policy": "baseline",
+      "avg_reward": 6141.525,
+      "std_dev": 0.0,
+      "missions_evaluated": 1
+    },
+    {
+      "rank": 2,
+      "policy": "random",
+      "avg_reward": 1197.3750000000002,
+      "std_dev": 0.0,
+      "missions_evaluated": 1
+    }
+  ]
+}

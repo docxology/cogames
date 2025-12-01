@@ -1,187 +1,145 @@
-# DAF Modernization - Quick Start Guide
+# DAF Quick Start Guide
+
+**Develop, evaluate, and compare CoGames policies using real simulation runs.**
 
 ## Installation
 
 ```bash
-cd /Users/4d/Documents/GitHub/cogames
-
-# Install dependencies
-pip install pydantic pyyaml rich
-
-# Verify installation
-python -m daf.tests.orchestrator --help
+cd cogames
+uv sync --all-extras
+source .venv/bin/activate
 ```
 
-## Running Tests
+## Quick Commands
 
-### Basic (All tests, default settings)
-```bash
-python -m daf.tests.orchestrator
-```
+### 1. Full Evaluation Suite (Recommended)
 
-### With Custom Workers
-```bash
-python -m daf.tests.orchestrator --workers 16
-```
-
-### Verbose Mode
-```bash
-python -m daf.tests.orchestrator --verbose
-```
-
-### CoGames Only
-```bash
-python -m daf.tests.orchestrator --only-cogames
-```
-
-### DAF Only
-```bash
-python -m daf.tests.orchestrator --only-daf
-```
-
-## Output
-
-All results saved to `daf_output/`:
-- **JSON**: `test_results.json` (primary data format)
-- **Markdown**: `TEST_RUN_SUMMARY.md` (human-readable report)
-- **HTML**: `test_report.html` (interactive dashboard)
-- **Logs**: `logs/` directory with execution traces
-
-## Configuration
-
-### Using YAML (Recommended)
-```yaml
-# daf_config.yaml
-execution:
-  max_workers: 8
-  parallel: true
-  retry_failed: true
-
-output:
-  base_dir: "./daf_output"
-  keep_old_runs: 10
-```
+Run real CoGames evaluations with comprehensive visualizations:
 
 ```bash
-# Load config (if implemented in main CLI)
-export DAF_CONFIG=daf_config.yaml
-python -m daf.tests.orchestrator
+# Quick evaluation (3 episodes, ~15 seconds)
+./daf/scripts/run_full_suite.sh --quick
+
+# Standard evaluation with sweep
+./daf/scripts/run_full_suite.sh
+
+# Custom policies and missions
+./daf/scripts/run_full_suite.sh --policies lstm baseline random --missions training_facility.harvest
+
+# Skip hyperparameter sweep
+./daf/scripts/run_full_suite.sh --quick --no-sweep
 ```
 
-### Using Environment Variables
+### 2. Unit Tests
+
+Run DAF module tests (mocked, fast):
+
 ```bash
-export DAF_EXECUTION__MAX_WORKERS=16
-export DAF_EXECUTION__VERBOSE=true
-export DAF_OUTPUT__KEEP_OLD_RUNS=5
-python -m daf.tests.orchestrator
+./daf/run_tests.sh
 ```
 
-## Key Modules
+### 3. Individual DAF Modules
 
-### Orchestrator
-**File**: `daf/tests/orchestrator.py`
-- Async test execution
-- Parallel execution
-- Result collection
-- JSON serialization
+```python
+# Policy Comparison
+from daf.src.comparison import daf_compare_policies
+from mettagrid.policy.policy import PolicySpec
+from cogames.cli.mission import get_mission
 
-### Reporter
-**File**: `daf/tests/unified_reporter.py`
-- JSON report generation
-- Markdown conversion
-- HTML dashboard
-- Metrics aggregation
+# Load mission
+name, env_cfg, _ = get_mission("training_facility.harvest")
 
-### Configuration
-**File**: `daf/modern_config.py`
-- Pydantic models
-- YAML parsing
-- Environment overrides
-- Validation
+# Compare policies
+report = daf_compare_policies(
+    policies=[PolicySpec(class_path="baseline"), PolicySpec(class_path="random")],
+    missions=[(name, env_cfg)],
+    episodes_per_mission=5,
+)
+print(report.summary_statistics)
+```
 
-## Performance
+```python
+# Hyperparameter Sweep
+from daf.src.sweeps import daf_launch_sweep
+from daf.src.config import DAFSweepConfig
 
-Expected execution times:
-- **Sequential**: ~353 seconds
-- **Parallel (8 workers)**: ~45-60 seconds
-- **Parallel (16 workers)**: ~30-40 seconds
+cfg = DAFSweepConfig(
+    name="my_sweep",
+    policy_class_path="baseline",
+    missions=["training_facility.harvest"],
+    strategy="grid",
+    search_space={"learning_rate": [0.001, 0.01]},
+    episodes_per_trial=3,
+)
+results = daf_launch_sweep(cfg)
+print(f"Best: {results.get_best_trial().hyperparameters}")
+```
 
-Actual time depends on hardware and system load.
+## Output Structure
 
-## Troubleshooting
+```
+daf_output/full_suite/suite_YYYYMMDD_HHMMSS/
+├── comparisons/
+│   ├── report.html                  # Interactive comparison
+│   ├── policy_rewards_comparison.png
+│   ├── performance_by_mission.png
+│   └── leaderboard.json
+├── sweeps/baseline/
+│   ├── sweep_progress.png           # Trial performance
+│   ├── heatmap.png                  # Parameter heatmap
+│   └── sweep_results.json
+├── dashboard/
+│   └── dashboard.html               # Summary dashboard
+└── SUITE_SUMMARY.json
+```
 
-### ImportError for pyyaml
+## Available Missions
+
 ```bash
-pip install pyyaml
+# List all missions
+python3 -c "from cogames.cogs_vs_clips.missions import MISSIONS; [print(m.full_name()) for m in MISSIONS[:10]]"
 ```
 
-### ImportError for rich
+Common missions:
+- `training_facility.harvest`
+- `training_facility.open_world`
+- `hello_world.hello_world_unclip`
+- `machina_1.open_world`
+
+## Available Policies
+
+| Policy | Description |
+|--------|-------------|
+| `baseline` | Scripted coordination agent |
+| `random` | Random action selection |
+| `lstm` | LSTM-based neural policy |
+| `stateless` | Feedforward neural network |
+
+## Workflow: Develop → Evaluate → Compare
+
+1. **Develop** your policy implementing `MultiAgentPolicy`:
+
+```python
+from mettagrid.policy.policy import MultiAgentPolicy
+
+class MyPolicy(MultiAgentPolicy):
+    def step_batch(self, observations, actions):
+        for i in range(len(observations)):
+            actions[i] = self.compute_action(observations[i])
+```
+
+2. **Evaluate** against baselines:
+
 ```bash
-pip install rich
+./daf/scripts/run_full_suite.sh --policies mypackage.MyPolicy baseline --quick
 ```
 
-### Permission Denied
-```bash
-chmod +x daf/tests/orchestrator.py
-```
+3. **Compare** with statistical analysis:
 
-### Tests Not Found
-Ensure working directory is project root:
-```bash
-cd /Users/4d/Documents/GitHub/cogames
-python -m daf.tests.orchestrator
-```
+Open `daf_output/full_suite/suite_*/comparisons/report.html`
 
-## Features
+## See Also
 
-### Async Execution
-- Concurrent test suite execution
-- Automatic worker pool sizing
-- Real-time progress tracking
-
-### Unified Reporting
-- Single JSON format (no separate .txt/.xml)
-- Auto-generated Markdown reports
-- Interactive HTML dashboard
-
-### Modern Configuration
-- Type-safe Pydantic models
-- Human-readable YAML configs
-- Environment variable overrides
-
-### Performance Profiling
-- Per-test timing
-- Per-suite aggregation
-- Percentile analysis
-
-### Error Handling
-- Automatic retries
-- Partial result recovery
-- Detailed error capture
-
-## Next Steps
-
-1. **Run first test**: `python -m daf.tests.orchestrator`
-2. **Review output**: `cat daf_output/TEST_RUN_SUMMARY.md`
-3. **Configure as needed**: Create `daf_config.yaml`
-4. **Integrate with CI/CD**: Use new orchestrator in workflows
-
-## Documentation
-
-- **Full Details**: See `MODERNIZATION_COMPLETE.md`
-- **Architecture**: See `daf/MODERNIZATION_PLAN.md`
-- **Source Code**: See individual module docstrings
-
-## Support
-
-For issues or questions:
-1. Check module docstrings
-2. Run with `--verbose` flag
-3. Review generated logs
-4. Check output in `daf_output/`
-
----
-
-*DAF Modernization - November 2025*  
-*Production Ready ✅*
-
+- `daf/examples/README.md` - Configuration examples
+- `daf/AGENTS.md` - Policy interfaces
+- `TECHNICAL_MANUAL.md` - Game mechanics

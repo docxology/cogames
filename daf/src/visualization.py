@@ -388,6 +388,216 @@ def daf_plot_policy_comparison(
     return generated_files
 
 
+def daf_plot_detailed_metrics_comparison(
+    comparison_report: "ComparisonReport",
+    output_dir: Path | str = "comparison_plots",
+    console: Optional[Console] = None,
+) -> list[Path]:
+    """Generate detailed metric comparison plots from agent metrics.
+
+    Args:
+        comparison_report: Report with policy_detailed_metrics populated
+        output_dir: Output directory for plots
+        console: Optional Rich console for output
+
+    Returns:
+        List of paths to generated plot files
+    """
+    if console is None:
+        console = Console()
+
+    if not HAS_MATPLOTLIB:
+        console.print("[yellow]⚠ matplotlib not available[/yellow]")
+        return []
+
+    detailed_metrics = getattr(comparison_report, 'policy_detailed_metrics', {})
+    if not detailed_metrics:
+        console.print("[dim]No detailed metrics available for visualization[/dim]")
+        return []
+
+    _setup_plot_style()
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    generated_files = []
+
+    policies = list(detailed_metrics.keys())
+    if not policies:
+        return []
+
+    # Get first mission's metrics (we'll combine all missions)
+    first_policy = policies[0]
+    first_mission = list(detailed_metrics[first_policy].keys())[0] if detailed_metrics[first_policy] else None
+    if not first_mission:
+        return []
+
+    # Aggregate metrics across missions for each policy
+    aggregated_metrics = {}
+    for policy in policies:
+        aggregated_metrics[policy] = {}
+        for mission, metrics in detailed_metrics[policy].items():
+            for metric_name, value in metrics.items():
+                if metric_name not in aggregated_metrics[policy]:
+                    aggregated_metrics[policy][metric_name] = []
+                aggregated_metrics[policy][metric_name].append(value)
+        # Average across missions
+        for metric_name in aggregated_metrics[policy]:
+            values = aggregated_metrics[policy][metric_name]
+            aggregated_metrics[policy][metric_name] = np.mean(values) if values else 0.0
+
+    # Group metrics by category
+    metric_categories = {
+        "Resources Gained": ["carbon.gained", "silicon.gained", "oxygen.gained", "germanium.gained"],
+        "Resources Held": ["carbon.amount", "silicon.amount", "oxygen.amount", "germanium.amount"],
+        "Energy": ["energy.amount", "energy.gained", "energy.lost"],
+        "Actions": ["action.move.success", "action.move.failed", "action.failed", "action.noop.success", "action.change_vibe.success"],
+        "Inventory": ["inventory.diversity", "inventory.diversity.ge.2", "inventory.diversity.ge.3", "inventory.diversity.ge.4", "inventory.diversity.ge.5"],
+    }
+
+    # Plot each category
+    for category_name, metric_names in metric_categories.items():
+        # Filter to metrics that exist
+        available_metrics = [m for m in metric_names if any(m in aggregated_metrics[p] for p in policies)]
+        if not available_metrics:
+            continue
+
+        fig, ax = plt.subplots(figsize=(max(10, len(available_metrics) * 1.5), 6))
+        x = np.arange(len(available_metrics))
+        width = 0.8 / len(policies)
+
+        for i, policy in enumerate(policies):
+            values = [aggregated_metrics[policy].get(m, 0.0) for m in available_metrics]
+            offset = width * (i - len(policies) / 2 + 0.5)
+            bars = ax.bar(x + offset, values, width, label=policy,
+                         color=PALETTE_COGAMES[i % len(PALETTE_COGAMES)], alpha=0.85, 
+                         edgecolor="black", linewidth=0.8)
+            
+            # Add value labels on top of bars
+            for bar, val in zip(bars, values):
+                if val > 0:
+                    ax.annotate(f"{val:.0f}", xy=(bar.get_x() + bar.get_width() / 2, bar.get_height()),
+                               xytext=(0, 3), textcoords="offset points",
+                               ha="center", va="bottom", fontsize=8, rotation=45)
+
+        ax.set_ylabel("Value", fontsize=12, fontweight="bold")
+        ax.set_xlabel("Metric", fontsize=12, fontweight="bold")
+        ax.set_title(f"{category_name} by Policy", fontsize=14, fontweight="bold")
+        ax.set_xticks(x)
+        ax.set_xticklabels([m.split(".")[-1] for m in available_metrics], rotation=45, ha="right")
+        ax.legend(fontsize=10, loc="upper right")
+        ax.grid(axis="y", alpha=0.3)
+
+        plt.tight_layout()
+        filename = f"metrics_{category_name.lower().replace(' ', '_')}.png"
+        out_path = output_dir / filename
+        plt.savefig(out_path, dpi=150, bbox_inches="tight")
+        plt.close()
+        generated_files.append(out_path)
+        console.print(f"[green]✓ Saved: {filename}[/green]")
+
+    # Create summary radar chart with key metrics
+    key_metrics = ["carbon.gained", "silicon.gained", "energy.gained", "inventory.diversity", "action.move.success"]
+    available_key = [m for m in key_metrics if any(m in aggregated_metrics[p] for p in policies)]
+    
+    if len(available_key) >= 3:
+        radar_path = _create_metrics_radar(policies, aggregated_metrics, available_key, output_dir / "metrics_radar.png")
+        if radar_path:
+            generated_files.append(radar_path)
+            console.print(f"[green]✓ Saved: metrics_radar.png[/green]")
+
+    # Create action distribution pie charts
+    action_path = _create_action_distribution(policies, aggregated_metrics, output_dir / "action_distribution.png")
+    if action_path:
+        generated_files.append(action_path)
+        console.print(f"[green]✓ Saved: action_distribution.png[/green]")
+
+    return generated_files
+
+
+def _create_metrics_radar(
+    policies: list[str],
+    aggregated_metrics: dict[str, dict[str, float]],
+    metric_names: list[str],
+    output_path: Path,
+) -> Optional[Path]:
+    """Create radar chart for key metrics comparison."""
+    if not HAS_MATPLOTLIB:
+        return None
+
+    # Calculate angles
+    angles = np.linspace(0, 2 * np.pi, len(metric_names), endpoint=False).tolist()
+    angles += angles[:1]
+
+    fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(polar=True))
+
+    for idx, policy in enumerate(policies):
+        values = [aggregated_metrics[policy].get(m, 0.0) for m in metric_names]
+        
+        # Normalize values
+        max_vals = [max(aggregated_metrics[p].get(m, 0.0) for p in policies) or 1 for m in metric_names]
+        normalized = [v / m if m > 0 else 0 for v, m in zip(values, max_vals)]
+        normalized += normalized[:1]
+        
+        ax.plot(angles, normalized, "o-", linewidth=2, label=policy, 
+               color=PALETTE_COGAMES[idx % len(PALETTE_COGAMES)])
+        ax.fill(angles, normalized, alpha=0.25, color=PALETTE_COGAMES[idx % len(PALETTE_COGAMES)])
+
+    ax.set_xticks(angles[:-1])
+    ax.set_xticklabels([m.split(".")[-1].replace("_", " ").title() for m in metric_names], fontsize=10)
+    ax.set_title("Key Metrics Comparison", fontsize=14, fontweight="bold", pad=20)
+    ax.legend(loc="upper right", bbox_to_anchor=(1.3, 1.0))
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return output_path
+
+
+def _create_action_distribution(
+    policies: list[str],
+    aggregated_metrics: dict[str, dict[str, float]],
+    output_path: Path,
+) -> Optional[Path]:
+    """Create pie charts showing action distribution for each policy."""
+    if not HAS_MATPLOTLIB:
+        return None
+
+    action_metrics = ["action.move.success", "action.move.failed", "action.noop.success", "action.change_vibe.success"]
+    action_labels = ["Move Success", "Move Failed", "Noop", "Change Vibe"]
+
+    fig, axes = plt.subplots(1, len(policies), figsize=(5 * len(policies), 5))
+    if len(policies) == 1:
+        axes = [axes]
+
+    for ax, policy in zip(axes, policies):
+        values = [aggregated_metrics[policy].get(m, 0.0) for m in action_metrics]
+        
+        # Only plot non-zero slices
+        non_zero_values = []
+        non_zero_labels = []
+        for v, l in zip(values, action_labels):
+            if v > 0:
+                non_zero_values.append(v)
+                non_zero_labels.append(l)
+        
+        if non_zero_values:
+            colors = PALETTE_COGAMES[:len(non_zero_values)]
+            wedges, texts, autotexts = ax.pie(non_zero_values, labels=non_zero_labels, colors=colors,
+                                               autopct="%1.1f%%", startangle=90, 
+                                               textprops={"fontsize": 9})
+            ax.set_title(policy, fontsize=12, fontweight="bold")
+        else:
+            ax.text(0.5, 0.5, "No data", ha="center", va="center", fontsize=12)
+            ax.set_title(policy, fontsize=12, fontweight="bold")
+
+    plt.suptitle("Action Distribution by Policy", fontsize=14, fontweight="bold")
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close()
+
+    return output_path
+
+
 def daf_plot_policy_radar(
     policy_metrics: dict[str, dict[str, float]],
     output_path: Path | str = "policy_radar.png",
@@ -1498,6 +1708,73 @@ def daf_export_comparison_html(
             )
 
         html_parts.append("    </table>")
+
+    # Detailed metrics section
+    detailed_metrics = getattr(comparison_report, 'policy_detailed_metrics', {})
+    if detailed_metrics:
+        html_parts.append("    <h2>Detailed Agent Metrics</h2>")
+        
+        # Get all metric names
+        all_metrics = set()
+        for policy_data in detailed_metrics.values():
+            for mission_data in policy_data.values():
+                all_metrics.update(mission_data.keys())
+        
+        # Group metrics by category
+        metric_categories = {
+            "Resources": [m for m in all_metrics if any(r in m for r in ["carbon", "silicon", "oxygen", "germanium"])],
+            "Energy": [m for m in all_metrics if "energy" in m],
+            "Actions": [m for m in all_metrics if "action" in m],
+            "Inventory": [m for m in all_metrics if "inventory" in m],
+            "Status": [m for m in all_metrics if "status" in m],
+        }
+        
+        for category, metrics in metric_categories.items():
+            if not metrics:
+                continue
+                
+            html_parts.append(f"    <h3>{category}</h3>")
+            html_parts.append("    <table>")
+            header = "      <tr><th>Metric</th>"
+            for policy in comparison_report.policies:
+                header += f"<th>{policy}</th>"
+            header += "</tr>"
+            html_parts.append(header)
+            
+            for metric in sorted(metrics):
+                row = f"      <tr><td>{metric}</td>"
+                values = []
+                for policy in comparison_report.policies:
+                    policy_metrics = detailed_metrics.get(policy, {})
+                    # Get first mission's metrics (or average across missions)
+                    val = 0.0
+                    count = 0
+                    for mission_metrics in policy_metrics.values():
+                        if metric in mission_metrics:
+                            val += mission_metrics[metric]
+                            count += 1
+                    if count > 0:
+                        val /= count
+                    values.append(val)
+                    row += f"<td>{val:.2f}</td>"
+                
+                # Highlight best value
+                if values:
+                    max_val = max(values)
+                    min_val = min(values)
+                    # For "failed" metrics, lower is better
+                    is_lower_better = "failed" in metric or "lost" in metric
+                    best_val = min_val if is_lower_better else max_val
+                    
+                    row = f"      <tr><td>{metric}</td>"
+                    for policy, val in zip(comparison_report.policies, values):
+                        style = " class='winner'" if val == best_val and best_val != 0 else ""
+                        row += f"<td{style}>{val:.2f}</td>"
+                
+                row += "</tr>"
+                html_parts.append(row)
+            
+            html_parts.append("    </table>")
 
     html_parts.append("  </div>")
     html_parts.append("</body>")

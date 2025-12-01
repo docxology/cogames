@@ -74,12 +74,10 @@ def daf_analyze_mission(mission_name: str, console: Optional[Console] = None) ->
     analysis = MissionAnalysis(mission_name)
 
     try:
-        from cogames.cli.mission import get_mission_name_and_config
+        from cogames.cli.mission import get_mission
 
-        from typer import Context
-
-        ctx = Context(lambda: None)
-        resolved_name, env_cfg, mission_cfg = get_mission_name_and_config(ctx, mission_name)
+        # Use get_mission directly (avoids typer.Context dependency)
+        resolved_name, env_cfg, mission_cfg = get_mission(mission_name)
 
         analysis.is_loadable = True
         analysis.env_config = env_cfg

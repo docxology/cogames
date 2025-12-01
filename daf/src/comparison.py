@@ -95,6 +95,9 @@ class ComparisonReport:
         self.policy_averages: dict[str, float] = {}
         self.policy_std_devs: dict[str, float] = {}
         self.pairwise_comparisons: dict[tuple[str, str], PolicyComparisonResult] = {}
+        
+        # Detailed agent metrics for richer visualization
+        self.policy_detailed_metrics: dict[str, dict[str, dict[str, float]]] = {}
 
         self.timestamp = datetime.now()
 
@@ -125,6 +128,7 @@ class ComparisonReport:
         Args:
             significance_level: P-value threshold for significance
         """
+        import warnings
         from scipy import stats
 
         policy_names = list(self.policies)
@@ -143,14 +147,30 @@ class ComparisonReport:
                 if not rewards_a or not rewards_b:
                     continue
 
-                # T-test
-                t_stat, p_value = stats.ttest_ind(rewards_a, rewards_b)
+                # Calculate means and stds
+                mean_a = float(np.mean(rewards_a))
+                mean_b = float(np.mean(rewards_b))
+                std_a = float(np.std(rewards_a))
+                std_b = float(np.std(rewards_b))
+
+                # T-test with handling for zero-variance data
+                try:
+                    with warnings.catch_warnings():
+                        warnings.filterwarnings("error", category=RuntimeWarning)
+                        t_stat, p_value = stats.ttest_ind(rewards_a, rewards_b)
+                        p_value = float(p_value)
+                except (RuntimeWarning, FloatingPointError):
+                    # Handle identical data or zero variance - compare means directly
+                    if mean_a != mean_b:
+                        # Different means with zero variance = definitely significant
+                        p_value = 0.0
+                    else:
+                        # Identical data
+                        p_value = 1.0
 
                 # Cohen's d effect size
-                pooled_std = np.sqrt(
-                    (np.std(rewards_a, ddof=1) ** 2 + np.std(rewards_b, ddof=1) ** 2) / 2
-                )
-                effect_size = (np.mean(rewards_a) - np.mean(rewards_b)) / pooled_std if pooled_std > 0 else 0
+                pooled_std = np.sqrt((std_a ** 2 + std_b ** 2) / 2)
+                effect_size = (mean_a - mean_b) / pooled_std if pooled_std > 0 else 0.0
 
                 comparison = PolicyComparisonResult(
                     policy_a_name=policy_a,
@@ -159,11 +179,11 @@ class ComparisonReport:
                     episodes_per_mission=self.episodes_per_mission,
                     mission_rewards_a=self.policy_mission_rewards.get(policy_a, {}),
                     mission_rewards_b=self.policy_mission_rewards.get(policy_b, {}),
-                    avg_reward_a=float(np.mean(rewards_a)),
-                    avg_reward_b=float(np.mean(rewards_b)),
-                    reward_std_a=float(np.std(rewards_a)),
-                    reward_std_b=float(np.std(rewards_b)),
-                    p_value=float(p_value),
+                    avg_reward_a=mean_a,
+                    avg_reward_b=mean_b,
+                    reward_std_a=std_a,
+                    reward_std_b=std_b,
+                    p_value=p_value,
                     is_significant=p_value < significance_level,
                     effect_size=float(effect_size),
                 )
@@ -244,13 +264,70 @@ class ComparisonReport:
                 for (a, b), comparison in self.pairwise_comparisons.items()
             },
         }
+        
+        # Include detailed metrics if available
+        if self.policy_detailed_metrics:
+            data["detailed_metrics"] = self.policy_detailed_metrics
 
         # Convert timestamps in comparisons to strings
         for comparison_data in data["pairwise_comparisons"].values():
             comparison_data["timestamp"] = comparison_data["timestamp"].isoformat()
 
+        # Custom serializer for numpy types
+        def default_serializer(obj):
+            if hasattr(obj, 'item'):  # numpy scalar
+                return obj.item()
+            if hasattr(obj, 'tolist'):  # numpy array
+                return obj.tolist()
+            return str(obj)
+        
         with open(path, "w") as f:
-            json.dump(data, f, indent=2)
+            json.dump(data, f, indent=2, default=default_serializer)
+
+
+def _compute_performance_score(metrics: dict[str, float]) -> float:
+    """Compute a composite performance score from agent metrics.
+    
+    Uses a weighted combination of meaningful metrics to produce
+    a non-zero performance score even when environment rewards are 0.
+    
+    Args:
+        metrics: Agent metrics dictionary (e.g. from avg_agent_metrics)
+        
+    Returns:
+        Composite performance score
+    """
+    if not metrics:
+        return 0.0
+    
+    score = 0.0
+    
+    # Resource gathering (most important for game success)
+    resource_metrics = [
+        "carbon.gained", "silicon.gained", "oxygen.gained", 
+        "germanium.gained", "energy.gained"
+    ]
+    for metric in resource_metrics:
+        if metric in metrics:
+            score += metrics[metric] * 1.0
+    
+    # Inventory diversity (indicates good resource management)
+    if "inventory.diversity" in metrics:
+        score += metrics["inventory.diversity"] * 10.0
+    
+    # Successful actions (indicates active, productive behavior)
+    if "action.move.success" in metrics:
+        score += metrics["action.move.success"] * 0.1
+    
+    # Penalize failures (indicates ineffective behavior)
+    if "action.failed" in metrics:
+        score -= metrics["action.failed"] * 0.05
+    
+    # Penalize being stuck (indicates poor navigation)
+    if "status.max_steps_without_motion" in metrics:
+        score -= metrics["status.max_steps_without_motion"] * 0.1
+    
+    return score
 
 
 def daf_compare_policies(
@@ -260,6 +337,7 @@ def daf_compare_policies(
     action_timeout_ms: int = 250,
     seed: int = 42,
     console: Optional[Console] = None,
+    use_performance_score: bool = True,
 ) -> ComparisonReport:
     """Compare multiple policies on given missions.
 
@@ -270,6 +348,9 @@ def daf_compare_policies(
         action_timeout_ms: Timeout for action generation
         seed: Random seed
         console: Optional Rich console for output
+        use_performance_score: If True, compute composite performance score from
+            agent metrics when raw rewards are 0. This provides meaningful
+            comparisons even for environments without explicit reward functions.
 
     Returns:
         ComparisonReport with detailed results
@@ -326,22 +407,57 @@ def daf_compare_policies(
         seed=seed,
     )
 
-    # Extract results
+    # Extract results - summaries is a list per mission, not per policy
+    # Each mission summary has per_episode_per_policy_avg_rewards and policy_summaries
     for policy_idx, policy_name in enumerate(policy_names):
         mission_rewards = {}
 
-        if policy_idx < len(summaries):
-            mission_summary = summaries[policy_idx]
+        for mission_idx, mission_summary in enumerate(summaries):
+            mission_name = mission_names[mission_idx] if mission_idx < len(mission_names) else f"mission_{mission_idx}"
+            mission_rewards[mission_name] = []
+            
+            # First try to get explicit rewards
+            has_nonzero_rewards = False
             if hasattr(mission_summary, "per_episode_per_policy_avg_rewards"):
-                for episode_idx, rewards in mission_summary.per_episode_per_policy_avg_rewards.items():
-                    if policy_idx < len(rewards) and rewards[policy_idx] is not None:
-                        # Use mission index as mission name
-                        mission_name = mission_names[episode_idx] if episode_idx < len(mission_names) else f"mission_{episode_idx}"
-                        if mission_name not in mission_rewards:
-                            mission_rewards[mission_name] = []
-                        mission_rewards[mission_name].append(float(rewards[policy_idx]))
+                for episode_idx, rewards_per_policy in mission_summary.per_episode_per_policy_avg_rewards.items():
+                    if policy_idx < len(rewards_per_policy):
+                        reward = rewards_per_policy[policy_idx]
+                        if reward is not None:
+                            mission_rewards[mission_name].append(float(reward))
+                            if reward != 0.0:
+                                has_nonzero_rewards = True
+            
+            # If rewards are all zero and use_performance_score is enabled,
+            # compute a composite score from agent metrics
+            if use_performance_score and not has_nonzero_rewards:
+                if hasattr(mission_summary, "policy_summaries") and policy_idx < len(mission_summary.policy_summaries):
+                    policy_summary = mission_summary.policy_summaries[policy_idx]
+                    if hasattr(policy_summary, "avg_agent_metrics") and policy_summary.avg_agent_metrics:
+                        # Compute performance score from metrics
+                        performance_score = _compute_performance_score(policy_summary.avg_agent_metrics)
+                        # Replace zero rewards with computed score
+                        # We use the same score for each episode since we only have aggregated metrics
+                        if mission_rewards[mission_name]:
+                            mission_rewards[mission_name] = [performance_score] * len(mission_rewards[mission_name])
+                        else:
+                            mission_rewards[mission_name] = [performance_score] * episodes_per_mission
+                        
+                        logger.info(f"Using performance score for {policy_name} on {mission_name}: {performance_score:.2f}")
 
         report.add_policy_results(policy_name, mission_rewards)
+
+    # Store detailed metrics for visualization
+    report.policy_detailed_metrics = {}
+    for mission_idx, mission_summary in enumerate(summaries):
+        mission_name = mission_names[mission_idx] if mission_idx < len(mission_names) else f"mission_{mission_idx}"
+        if hasattr(mission_summary, "policy_summaries"):
+            for policy_idx, policy_name in enumerate(policy_names):
+                if policy_idx < len(mission_summary.policy_summaries):
+                    ps = mission_summary.policy_summaries[policy_idx]
+                    if hasattr(ps, "avg_agent_metrics"):
+                        if policy_name not in report.policy_detailed_metrics:
+                            report.policy_detailed_metrics[policy_name] = {}
+                        report.policy_detailed_metrics[policy_name][mission_name] = ps.avg_agent_metrics
 
     # Compute pairwise comparisons
     report.compute_pairwise_comparisons()

@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-12-01T11:58:07.021513",
+  "policies": [
+    "baseline",
+    "random"
+  ],
+  "missions": [
+    "hello_world.hello_world_unclip"
+  ],
+  "episodes_per_mission": 5,
+  "summary_statistics": {
+    "baseline": {
+      "avg_reward": 6141.525,
+      "std_dev": 0.0
+    },
+    "random": {
+      "avg_reward": 1197.3750000000002,
+      "std_dev": 0.0
+    }
+  },
+  "pairwise_comparisons": {
+    "baseline_vs_random": {
+      "policy_a_name": "baseline",
+      "policy_b_name": "random",
+      "missions": [
+        "hello_world.hello_world_unclip"
+      ],
+      "episodes_per_mission": 5,
+      "mission_rewards_a": {
+        "hello_world.hello_world_unclip": [
+          6141.525,
+          6141.525,
+          6141.525,
+          6141.525,
+          6141.525
+        ]
+      },
+      "mission_rewards_b": {
+        "hello_world.hello_world_unclip": [
+          1197.3750000000002,
+          1197.3750000000002,
+          1197.3750000000002,
+          1197.3750000000002,
+          1197.3750000000002
+        ]
+      },
+      "avg_reward_a": 6141.525,
+      "avg_reward_b": 1197.3750000000002,
+      "reward_std_a": 0.0,
+      "reward_std_b": 0.0,
+      "p_value": 0.0,
+      "is_significant": true,
+      "effect_size": 0.0,
+      "timestamp": "2025-12-01T11:58:29.117705"
+    }
+  },
+  "detailed_metrics": {
+    "baseline": {
+      "hello_world.hello_world_unclip": {
+        "action.change_vibe.success": 62.0,
+        "action.failed": 2318.5,
+        "action.move.failed": 2318.5,
+        "action.move.success": 2619.5,
+        "carbon.amount": 50.0,
+        "carbon.gained": 50.0,
+        "energy.amount": 256.0,
+        "energy.gained": 5495.0,
+        "energy.lost": 5239.0,
+        "germanium.amount": 5.0,
+        "germanium.gained": 5.0,
+        "inventory.diversity": 25.0,
+        "inventory.diversity.ge.2": 5.0,
+        "inventory.diversity.ge.3": 5.0,
+        "inventory.diversity.ge.4": 5.0,
+        "inventory.diversity.ge.5": 5.0,
+        "oxygen.amount": 50.0,
+        "oxygen.gained": 50.0,
+        "silicon.amount": 150.0,
+        "silicon.gained": 150.0,
+        "status.max_steps_without_motion": 45.0
+      }
+    },
+    "random": {
+      "hello_world.hello_world_unclip": {
+        "action.change_vibe.success": 4841.0,
+        "action.failed": 4.5,
+        "action.move.failed": 4.5,
+        "action.move.success": 127.0,
+        "action.noop.success": 27.5,
+        "carbon.amount": 50.0,
+        "carbon.gained": 50.0,
+        "energy.amount": 499.5,
+        "energy.gained": 753.5,
+        "energy.lost": 254.0,
+        "germanium.amount": 5.0,
+        "germanium.gained": 5.0,
+        "inventory.diversity": 25.0,
+        "inventory.diversity.ge.2": 5.0,
+        "inventory.diversity.ge.3": 5.0,
+        "inventory.diversity.ge.4": 5.0,
+        "inventory.diversity.ge.5": 5.0,
+        "oxygen.amount": 50.0,
+        "oxygen.gained": 50.0,
+        "silicon.amount": 150.0,
+        "silicon.gained": 150.0,
+        "status.max_steps_without_motion": 736.0
+      }
+    }
+  }
+}

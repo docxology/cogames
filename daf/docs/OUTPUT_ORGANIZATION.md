@@ -20,19 +20,34 @@ DAF uses a centralized output management system that organizes all operations (s
 ├── sweeps/                  # Hyperparameter sweep results
 │   ├── YYYYMMDD_HHMMSS/    # Session ID
 │   │   ├── sweep_name/
-│   │   │   ├── summary_report.json
-│   │   │   ├── results.json
-│   │   │   └── best_configs.json
+│   │   │   ├── sweep_results.json       # Full trial results
+│   │   │   ├── sweep_progress.png       # Performance over trials
+│   │   │   ├── best_configuration.png   # Best hyperparameters
+│   │   │   ├── hyperparameter_importance.png
+│   │   │   ├── heatmap.png              # Parameter heatmap
+│   │   │   └── parallel.png             # Parallel coordinates
 │   │   └── ...
 │   └── ...
 │
 ├── comparisons/             # Policy comparison results
 │   ├── YYYYMMDD_HHMMSS/
-│   │   ├── comparison_name/
-│   │   │   ├── summary_report.json
-│   │   │   ├── statistical_tests.json
-│   │   │   └── pairwise_comparisons.json
-│   │   └── ...
+│   │   ├── comparison_results.json     # Full results with detailed_metrics
+│   │   ├── leaderboard.json            # Policy rankings
+│   │   ├── report.html                 # Interactive HTML report
+│   │   │
+│   │   │   # Basic comparison plots
+│   │   ├── policy_rewards_comparison.png
+│   │   ├── performance_by_mission.png
+│   │   ├── reward_distributions.png
+│   │   │
+│   │   │   # Detailed metrics plots
+│   │   ├── metrics_resources_gained.png
+│   │   ├── metrics_resources_held.png
+│   │   ├── metrics_energy.png
+│   │   ├── metrics_actions.png
+│   │   ├── metrics_inventory.png
+│   │   ├── metrics_radar.png
+│   │   └── action_distribution.png
 │   └── ...
 │
 ├── training/                # Training run outputs
@@ -72,6 +87,28 @@ DAF uses a centralized output management system that organizes all operations (s
 │   │   ├── comparison_plots.png
 │   │   ├── comparison_report.html
 │   │   └── leaderboard.html
+│   └── ...
+│
+├── full_suite/              # Full evaluation suite outputs
+│   ├── suite_YYYYMMDD_HHMMSS/
+│   │   ├── SUITE_SUMMARY.json
+│   │   ├── SUITE_SUMMARY.txt
+│   │   │
+│   │   ├── comparisons/     # Policy comparison outputs
+│   │   │   ├── comparison_results.json
+│   │   │   ├── report.html
+│   │   │   ├── metrics_*.png           # All detailed metrics
+│   │   │   └── ...
+│   │   │
+│   │   ├── sweeps/          # Hyperparameter sweep outputs
+│   │   │   └── baseline/
+│   │   │       ├── sweep_results.json
+│   │   │       └── *.png
+│   │   │
+│   │   └── dashboard/       # Combined dashboard
+│   │       ├── dashboard.html
+│   │       ├── comparisons/
+│   │       └── sweeps/
 │   └── ...
 │
 ├── logs/                    # Session and operation logs
@@ -355,6 +392,7 @@ python -m daf.utils.migrate_output_structure daf_output.backup daf_output
 - [Logging Configuration](./docs/LOGGING.md) - Structured logging setup
 - [Test Infrastructure](./docs/RUNNING_TESTS.md) - Test execution guide
 - [DAF README](./README.md) - Module overview
+
 
 
 

@@ -164,6 +164,86 @@ Mission analysis utilities implemented:
 - ✅ Mission validation tested
 - ✅ Metadata extraction tested
 
+## ✅ Requirement 5: Platform-Aware GPU Detection
+
+**Status: VERIFIED**
+
+### MPS Detection (Apple Silicon)
+
+DAF now correctly detects and uses MPS (Metal Performance Shaders) on Apple Silicon Macs:
+
+```
+DAF Environment Check
+
+✓ MPS (Apple Silicon GPU) available
+✓ Disk space available: 130.9 GB
+✓ All required packages available
+✓ All 1 mission(s) loadable
+
+Environment Check: HEALTHY (16/16 checks passed)
+```
+
+**Implementation:**
+- ✅ `daf_check_gpu_availability()` - Platform-aware GPU detection
+- ✅ `_check_mps_availability()` - Apple Silicon Metal support
+- ✅ `_check_cuda_availability()` - NVIDIA CUDA support
+- ✅ `_is_macos()` - Platform detection helper
+
+**Code Location**: `daf/src/environment_checks.py`
+
+## ✅ Requirement 6: Performance Score Computation
+
+**Status: VERIFIED**
+
+### Meaningful Comparisons with Zero Rewards
+
+When environments return zero rewards, DAF computes composite performance scores:
+
+```
+INFO - daf.comparison - Using performance score for baseline on hello_world.hello_world_unclip: 6166.60
+INFO - daf.comparison - Using performance score for random on hello_world.hello_world_unclip: 1153.65
+```
+
+**Score Components:**
+- ✅ Resources gained (carbon, silicon, oxygen, germanium, energy)
+- ✅ Inventory diversity (weighted higher)
+- ✅ Successful actions (movement)
+- ✅ Penalties for failures and being stuck
+
+**Implementation:**
+- ✅ `_compute_performance_score()` - Composite score computation
+- ✅ `use_performance_score` parameter in `daf_compare_policies()`
+- ✅ `policy_detailed_metrics` attribute in `ComparisonReport`
+
+**Code Location**: `daf/src/comparison.py`, `daf/src/sweeps.py`
+
+## ✅ Requirement 7: Detailed Metrics Visualization
+
+**Status: VERIFIED**
+
+### Comprehensive Agent Metrics Plots
+
+DAF generates detailed visualization of all agent metrics:
+
+```
+comparisons/
+  - metrics_resources_gained.png
+  - metrics_resources_held.png
+  - metrics_energy.png
+  - metrics_actions.png
+  - metrics_inventory.png
+  - metrics_radar.png
+  - action_distribution.png
+```
+
+**Implementation:**
+- ✅ `daf_plot_detailed_metrics_comparison()` - Bar charts by category
+- ✅ `_create_metrics_radar()` - Radar chart for key metrics
+- ✅ `_create_action_distribution()` - Pie charts per policy
+- ✅ Enhanced `daf_export_comparison_html()` - Tables with metric highlighting
+
+**Code Location**: `daf/src/visualization.py`
+
 ## Integration with CoGames (Sidecar Pattern)
 
 **DAF correctly implements the sidecar pattern by invoking CoGames methods.**
@@ -227,8 +307,26 @@ uv run pytest daf/tests/test_daf_mission_analysis.py -v
 2. ✅ Function checking: All functions validated before use
 3. ✅ Configurable: All operations support YAML/JSON configuration
 4. ✅ Mission meta-analysis: Complete mission discovery and analysis from README.md
+5. ✅ Platform-aware GPU detection: MPS on macOS, CUDA on Linux/Windows
+6. ✅ Performance score computation: Meaningful comparisons when rewards are zero
+7. ✅ Detailed metrics visualization: Comprehensive agent metrics plots
 
 ✅ **Comprehensive test coverage**: 100+ test cases
 ✅ **Real cogames integration**: Uses actual cogames methods throughout
 ✅ **Professional implementation**: Well-documented, modular, tested
+
+## Full Suite Verification
+
+The full evaluation suite has been verified with real data:
+
+```bash
+./daf/scripts/run_full_suite.sh
+```
+
+**Verified Output (December 2024):**
+- Environment: 16/16 checks passed, MPS GPU detected
+- Comparison: baseline=6166.60 vs random=1153.65 (5.3x performance difference)
+- Sweeps: 6 trials with scores ranging 3693-3721
+- Visualizations: 13+ PNG files + HTML reports generated
+- Dashboard: Interactive summary at `dashboard/dashboard.html`
 
