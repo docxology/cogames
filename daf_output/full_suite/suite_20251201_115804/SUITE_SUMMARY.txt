@@ -1,0 +1,16 @@
+============================================================
+CoGames Full Suite Summary
+============================================================
+
+Timestamp: 2025-12-01T12:00:46.868186
+Duration: 162.1s
+
+RESULTS:
+  Comparison: success
+  Sweep 1: success
+  Dashboard: success
+
+OUTPUT FILES:
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20251201_115804/comparisons/report.html
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20251201_115804/sweeps/*/sweep_progress.png
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20251201_115804/dashboard/dashboard.html

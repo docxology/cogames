@@ -1,0 +1,71 @@
+# DAF Pipeline Orchestration Configuration Example
+#
+# This configuration chains multiple workflow stages into a single
+# automated pipeline: training → sweep → comparison → deployment
+#
+# Usage: cogames daf-pipeline training --config pipeline_config.yaml
+
+name: "full_agent_development_pipeline"
+description: "Complete workflow from training through deployment"
+
+# Pipeline stages in order of execution
+stages:
+  - "training"
+  - "sweep"
+  - "comparison"
+
+# Training configuration
+training_config:
+  policy_class_path: "cogames.policy.lstm.LSTMPolicy"
+  missions:
+    - "training_facility_1"
+  num_training_steps: 1000000
+  device: "auto"
+  batch_size: 4096
+  minibatch_size: 4096
+
+# Hyperparameter sweep configuration
+sweep_config:
+  name: "post_training_sweep"
+  missions:
+    - "training_facility_2"
+  policy_class_path: "cogames.policy.lstm.LSTMPolicy"
+  strategy: "random"
+  search_space:
+    learning_rate: [0.0001, 0.001, 0.01]
+    dropout: [0.1, 0.2, 0.3]
+  num_trials: 9
+  episodes_per_trial: 3
+
+# Comparison configuration
+comparison_config:
+  name: "final_policy_comparison"
+  policies:
+    - "cogames.policy.lstm.LSTMPolicy"
+    - "cogames.policy.scripted_agent.baseline_agent.BaselinePolicy"
+  missions:
+    - "training_facility_1"
+    - "training_facility_2"
+    - "assembler_2"
+  episodes_per_mission: 5
+  generate_html_report: true
+
+# Deployment configuration (optional)
+deployment_config:
+  policy_name: "optimized_lstm_agent"
+  policy_class_path: "cogames.policy.lstm.LSTMPolicy"
+  deployment_endpoint: "https://alb.softmax.com/submit"
+  authentication_server: "https://auth.softmax.com"
+
+# Pipeline execution settings
+stop_on_failure: true
+parallel_stages: false
+notify_on_completion: false
+
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+# DAF Policy Comparison Configuration Example
+#
+# This configuration sets up a policy comparison between multiple
+# agents across a standard mission set.
+#
+# Usage: cogames daf-compare --config comparison_config.yaml
+
+name: "lstm_vs_baseline_comparison"
+description: "Compare trained LSTM policy against baseline and random policies"
+
+# Policies to compare
+policies:
+  - "cogames.policy.lstm.LSTMPolicy"
+  - "cogames.policy.scripted_agent.baseline_agent.BaselinePolicy"
+  - "cogames.policy.scripted_agent.starter_agent.StarterPolicy"
+
+# Optional weights for each policy
+# Leave empty for default/random weights
+policy_weights:
+  - "./checkpoints/lstm_trained.pt"
+  - null  # Use default baseline
+  - null  # Use default starter
+
+# Missions to evaluate on
+missions:
+  - "training_facility_1"
+  - "training_facility_2"
+  - "assembler_2"
+
+# Evaluation settings
+episodes_per_mission: 5
+max_steps_per_episode: 1000
+seed: 42
+
+# Statistical analysis settings
+significance_level: 0.05
+bootstrap_samples: 1000
+
+# Output options
+generate_html_report: true
+save_raw_results: true
+
+
+
+
+
+
+
+
