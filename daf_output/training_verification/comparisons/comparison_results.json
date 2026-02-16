@@ -1,0 +1,53 @@
+{
+  "timestamp": "2026-02-16T11:50:25.212333",
+  "policies": [
+    "StarterPolicy"
+  ],
+  "missions": [
+    "cogsguard_machina_1.basic"
+  ],
+  "episodes_per_mission": 3,
+  "summary_statistics": {
+    "StarterPolicy": {
+      "avg_reward": 28791.335416666665,
+      "std_dev": 1593.5751363657319
+    }
+  },
+  "pairwise_comparisons": {},
+  "detailed_metrics": {
+    "StarterPolicy": {
+      "cogsguard_machina_1.basic": {
+        "action.failed": 2921.5416666666665,
+        "action.move.failed": 2921.5416666666665,
+        "action.move.success": 7078.458333333333,
+        "carbon.amount": 0.5416666666666666,
+        "carbon.gained": 0.7083333333333334,
+        "cell.visited": 199293.25,
+        "energy.amount": 17.291666666666668,
+        "energy.gained": 28307.458333333332,
+        "energy.lost": 28390.166666666668,
+        "germanium.amount": 0.4583333333333333,
+        "germanium.gained": 2.3333333333333335,
+        "germanium.lost": 1.875,
+        "heart.amount": 0.5,
+        "heart.gained": 0.875,
+        "hp.amount": 90.625,
+        "hp.gained": 17317.708333333332,
+        "hp.lost": 17277.083333333332,
+        "miner.amount": 0.041666666666666664,
+        "miner.gained": 0.16666666666666666,
+        "miner.lost": 0.125,
+        "scrambler.amount": 0.08333333333333333,
+        "scrambler.gained": 0.08333333333333333,
+        "silicon.amount": 2.5416666666666665,
+        "silicon.gained": 7.125,
+        "silicon.lost": 4.583333333333333,
+        "solar.amount": 3.0,
+        "solar.gained": 102.0,
+        "solar.lost": 100.0,
+        "status.max_steps_without_motion": 880.5833333333334,
+        "performance_score": 28791.335416666665
+      }
+    }
+  }
+}

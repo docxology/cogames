@@ -30,6 +30,8 @@ dependencies = [
   "ipykernel>=6.29.5",
   # Only used by cogames upload tests; could be moved to optional dep group
   "pytest-httpserver>=1.1.0",
+  "pillow>=12.1.1",
+  "matplotlib>=3.10.8",
 ]
 dynamic = ["version"]
 

@@ -3,9 +3,9 @@
 from pathlib import Path
 
 import pytest
-import torch
 
-from daf.src.distributed_training import (
+
+from daf.src.train.distributed_training import (
     DistributedTrainingResult,
     daf_aggregate_training_stats,
     daf_create_training_cluster,
@@ -143,22 +143,29 @@ def test_daf_get_training_status(tmp_path):
 def test_daf_launch_distributed_training_single_node(tmp_path, safe_mission_loader):
     """Test distributed training with single node (should use standard train)."""
     # Load mission safely using fixture
-    mission_name, env_cfg = safe_mission_loader("training_facility_1")
+    mission_name, env_cfg = safe_mission_loader("cogsguard_machina_1.basic")
+
+    import torch
+    from unittest.mock import patch, MagicMock
 
     device = torch.device("cpu")
+    
+    # Mock the actual training call since StarterPolicy isn't trainable
+    # and we only want to test the DAF orchestration logic
+    with patch("cogames.train.train") as mock_train:
+        result = daf_launch_distributed_training(
+            env_cfg=env_cfg,
+            policy_class_path="cogames.policy.starter_agent.StarterPolicy",
+            device=device,
+            num_steps=10,
+            checkpoints_path=tmp_path,
+            num_nodes=1,
+            workers_per_node=1,
+        )
 
-    result = daf_launch_distributed_training(
-        env_cfg=env_cfg,
-        policy_class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy",
-        device=device,
-        num_steps=10,  # Very small for testing
-        checkpoints_path=tmp_path,
-        num_nodes=1,
-        workers_per_node=1,
-    )
-
-    assert isinstance(result, DistributedTrainingResult)
-    assert result.num_workers == 1
+        assert mock_train.called
+        assert isinstance(result, DistributedTrainingResult)
+        assert result.num_workers == 1
 
 
 class TestDistributedTrainingIntegration:

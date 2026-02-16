@@ -132,7 +132,7 @@ def run_policy_evaluation(
     """Run policy evaluation on missions."""
     console.print("\n[bold cyan]═══ Policy Evaluation ═══[/bold cyan]\n")
     
-    from daf.src.comparison import daf_compare_policies, ComparisonReport
+    from daf.src.eval.comparison import daf_compare_policies, ComparisonReport
     from daf.src import visualization
     from mettagrid.policy.policy import PolicySpec
     from cogames.cli.mission import get_mission
@@ -228,8 +228,8 @@ def run_hyperparameter_sweep(
     """Run hyperparameter sweep with visualization."""
     console.print("\n[bold cyan]═══ Hyperparameter Sweep ═══[/bold cyan]\n")
     
-    from daf.src.sweeps import daf_launch_sweep, SweepResult
-    from daf.src.config import DAFSweepConfig
+    from daf.src.eval.sweeps import daf_launch_sweep, SweepResult
+    from daf.src.core.config import DAFSweepConfig
     from daf.src import visualization
     
     console.print(f"[dim]Policy: {policy}[/dim]")

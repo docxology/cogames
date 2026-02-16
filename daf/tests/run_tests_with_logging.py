@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-from test_runner_logging import TestRunnerLogger
+from test_runner_logging import DAFRunnerLogger
 
 
 def collect_test_counts(test_file: str) -> int:
@@ -92,7 +92,7 @@ def main():
     args = parser.parse_args()
     
     # Initialize logger
-    runner_logger = TestRunnerLogger(
+    runner_logger = DAFRunnerLogger(
         output_base=args.output_dir,
         verbose=args.verbose
     )

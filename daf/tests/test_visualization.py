@@ -4,9 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from daf.src.comparison import ComparisonReport
-from daf.src.sweeps import SweepResult, SweepTrialResult
-from daf.src.visualization import (
+from daf.src.eval.comparison import ComparisonReport
+from daf.src.eval.sweeps import SweepResult, SweepTrialResult
+from daf.src.viz.visualization import (
     daf_export_comparison_html,
     daf_generate_leaderboard,
     daf_plot_policy_comparison,

@@ -9,8 +9,8 @@
 #
 # Options:
 #   --quick              Quick mode (3 episodes, minimal sweep)
-#   --policies P1 P2...  Policies to evaluate (default: baseline random)
-#   --missions M1 M2...  Missions to run on (default: training_facility_1)
+#   --policies P1 P2...  Policies to evaluate (default: cogames.policy.starter_agent.StarterPolicy)
+#   --missions M1 M2...  Missions to run on (default: cogsguard_machina_1.basic)
 #   --no-sweep           Skip hyperparameter sweep phase
 #   --help               Show this help message
 #
@@ -19,10 +19,10 @@
 #   ./daf/scripts/run_full_suite.sh --quick
 #
 #   # Full evaluation with LSTM
-#   ./daf/scripts/run_full_suite.sh --policies lstm baseline random
+#   ./daf/scripts/run_full_suite.sh --policies lstm cogames.policy.starter_agent.StarterPolicy
 #
 #   # Multiple missions
-#   ./daf/scripts/run_full_suite.sh --missions training_facility_1 assembler_2
+#   ./daf/scripts/run_full_suite.sh --missions cogsguard_machina_1.basic assembler_2
 
 set -e
 
@@ -45,8 +45,8 @@ echo "║          Real Policy Evaluation + Visualizations                 ║"
 echo "╚══════════════════════════════════════════════════════════════════╝"
 echo ""
 
-# Run the Python script with all arguments
-python3 "$SCRIPT_DIR/run_full_suite.py" "$@"
+# Run the Python script with torch preloaded to avoid macOS ARM + Python 3.13 abort
+python3 "$SCRIPT_DIR/_preload_torch.py" "$SCRIPT_DIR/run_full_suite.py" "$@"
 exit_code=$?
 
 # Show output location reminder

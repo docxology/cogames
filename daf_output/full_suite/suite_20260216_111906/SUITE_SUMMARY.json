@@ -1,0 +1,47 @@
+{
+  "timestamp": "2026-02-16T11:49:04.719892",
+  "elapsed_seconds": 1798.4883279800415,
+  "output_dir": "/Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906",
+  "auth": {
+    "status": "skipped",
+    "authenticated": false,
+    "reason": "'bool' object has no attribute 'get'"
+  },
+  "comparison": {
+    "status": "failed",
+    "error": "No module named 'pandas'"
+  },
+  "sweeps": [
+    {
+      "status": "success",
+      "output_dir": "/Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/sweeps/baseline",
+      "num_trials": 6,
+      "best_config": {
+        "learning_rate": 0.0001,
+        "hidden_size": 64
+      },
+      "best_metric": 0.0
+    }
+  ],
+  "training": {
+    "status": "failed",
+    "error": "Invalid symbol name: baseline"
+  },
+  "gif": {
+    "status": "success",
+    "output_dir": "/Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/gifs",
+    "gifs_generated": 1,
+    "gif_files": [
+      "/Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/gifs/345e2b06-bcef-4484-98a2-ff94c0d3b57c.gif"
+    ]
+  },
+  "scoring": {
+    "status": "skipped",
+    "reason": "comparison_failed"
+  },
+  "dashboard": {
+    "status": "success",
+    "output_dir": "/Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/dashboard",
+    "files_generated": 5
+  }
+}

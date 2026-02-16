@@ -1,0 +1,21 @@
+============================================================
+CoGames Full Suite Summary
+============================================================
+
+Timestamp: 2026-02-16T11:49:04.720121
+Duration: 1798.5s
+
+RESULTS:
+  Auth:         skipped
+  Comparison:   failed
+  Sweep 1:      success
+  Training:     failed
+  GIF:          success
+  Scoring:      skipped
+  Dashboard:    success
+
+OUTPUT FILES:
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/comparisons/report.html
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/sweeps/*/sweep_progress.png
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/gifs/*.gif
+  /Users/4d/Documents/GitHub/cogames/daf_output/full_suite/suite_20260216_111906/dashboard/dashboard.html

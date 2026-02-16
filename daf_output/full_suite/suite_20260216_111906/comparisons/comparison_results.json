@@ -1,0 +1,55 @@
+{
+  "timestamp": "2026-02-16T11:19:07.606573",
+  "policies": [
+    "StarterPolicy"
+  ],
+  "missions": [
+    "cogsguard_machina_1.basic"
+  ],
+  "episodes_per_mission": 5,
+  "summary_statistics": {
+    "StarterPolicy": {
+      "avg_reward": 30502.53,
+      "std_dev": 2262.036046872374
+    }
+  },
+  "pairwise_comparisons": {},
+  "detailed_metrics": {
+    "StarterPolicy": {
+      "cogsguard_machina_1.basic": {
+        "action.failed": 2501.7,
+        "action.move.failed": 2501.7,
+        "action.move.success": 7498.3,
+        "aligner.amount": 0.025,
+        "aligner.gained": 0.025,
+        "cell.visited": 126312.15,
+        "energy.amount": 26.425,
+        "energy.gained": 29995.925,
+        "energy.lost": 30069.5,
+        "germanium.amount": 0.1,
+        "germanium.gained": 1.225,
+        "germanium.lost": 1.125,
+        "heart.amount": 0.825,
+        "heart.gained": 0.85,
+        "hp.amount": 128.95,
+        "hp.gained": 18173.325,
+        "hp.lost": 18094.375,
+        "influence.amount": 0.0,
+        "influence.gained": 1787.95,
+        "influence.lost": 1787.95,
+        "miner.amount": 0.025,
+        "miner.gained": 0.05,
+        "miner.lost": 0.025,
+        "scout.amount": 0.1,
+        "scout.gained": 0.1,
+        "silicon.amount": 1.6,
+        "silicon.gained": 5.7,
+        "solar.amount": 3.0,
+        "solar.gained": 102.0,
+        "solar.lost": 100.0,
+        "status.max_steps_without_motion": 1253.65,
+        "performance_score": 30502.53
+      }
+    }
+  }
+}

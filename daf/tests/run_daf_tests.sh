@@ -21,6 +21,10 @@
 
 set -o pipefail
 
+# Torch preload wrapper — prevents SIGABRT from torch's C extension
+# conflicting with pytest's signal handlers on macOS ARM + Python 3.13
+PRELOAD_SCRIPT="$(cd "$(dirname "$0")" && pwd)/../scripts/_preload_torch.py"
+
 # Parse command line arguments
 VERBOSE=false
 SKIP_SKIPPED=false
@@ -104,7 +108,7 @@ mkdir -p "$TEST_OUTPUT" "$LOG_DIR"
 collect_test_counts() {
     local test_file=$1
     if [ -f "$test_file" ]; then
-        python -m pytest "$test_file" --collect-only -q 2>/dev/null | tail -1 | grep -oE '[0-9]+' | head -1 || echo "0"
+        python "$PRELOAD_SCRIPT" -m pytest "$test_file" --collect-only -q 2>/dev/null | tail -1 | grep -oE '[0-9]+' | head -1 || echo "0"
     else
         echo "0"
     fi
@@ -160,6 +164,9 @@ DAF_TESTS=(
     "daf/tests/test_distributed_training.py:Distributed Training Tests"
     "daf/tests/test_visualization.py:Visualization Tests"
     "daf/tests/test_mission_analysis.py:Mission Analysis Tests"
+    "daf/tests/test_auth_integration.py:Auth Integration Tests"
+    "daf/tests/test_orchestrators.py:Orchestrators Tests"
+    "daf/tests/test_full_suite.py:Full Suite Tests"
 )
 
 PHASE2_TOTAL=0
@@ -249,7 +256,7 @@ else
                 echo "Running CoGames $test_name..."
                 output_file="$TEST_OUTPUT/cogames_$(basename "$test_file" .py)_output.txt"
                 
-                python -m pytest "$test_file" -v $PYTEST_EXTRA_ARGS 2>&1 | tee "$output_file"
+                python "$PRELOAD_SCRIPT" -m pytest "$test_file" -v $PYTEST_EXTRA_ARGS 2>&1 | tee "$output_file"
                 test_exit_code=$?
                 
                 if [ $test_exit_code -eq 0 ]; then
@@ -302,6 +309,9 @@ else
         "daf/tests/test_distributed_training.py:Distributed Training Tests"
         "daf/tests/test_visualization.py:Visualization Tests"
         "daf/tests/test_mission_analysis.py:Mission Analysis Tests"
+        "daf/tests/test_auth_integration.py:Auth Integration Tests"
+        "daf/tests/test_orchestrators.py:Orchestrators Tests"
+        "daf/tests/test_full_suite.py:Full Suite Tests"
     )
 
     # Run each DAF test suite
@@ -312,7 +322,7 @@ else
             echo "Running DAF $test_name..."
             output_file="$TEST_OUTPUT/daf_$(basename "$test_file" .py)_output.txt"
             
-            python -m pytest "$test_file" -v $PYTEST_EXTRA_ARGS 2>&1 | tee "$output_file"
+            python "$PRELOAD_SCRIPT" -m pytest "$test_file" -v $PYTEST_EXTRA_ARGS 2>&1 | tee "$output_file"
             test_exit_code=$?
             
             if [ $test_exit_code -eq 0 ]; then
@@ -329,8 +339,7 @@ else
     done
 fi
 
-# Note: Orchestrators tests require additional setup
-echo "NOTE: Skipping DAF Orchestrators tests - requires additional infrastructure setup"
+
 echo ""
 
 echo "=========================================="

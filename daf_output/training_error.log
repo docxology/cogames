@@ -1,0 +1,11 @@
+Error: Policy cogames.policy.starter_agent.StarterPolicy must be trainable (network() returned None)
+Traceback (most recent call last):
+  File "/Users/4d/Documents/GitHub/cogames/daf/scripts/run_full_suite.py", line 434, in run_training
+    result = daf_launch_distributed_training(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/4d/Documents/GitHub/cogames/daf/src/train/distributed_training.py", line 157, in daf_launch_distributed_training
+    train(
+  File "/Users/4d/Documents/GitHub/cogames/src/cogames/train.py", line 220, in train
+    assert network is not None, f"Policy {policy_class_path} must be trainable (network() returned None)"
+           ^^^^^^^^^^^^^^^^^^^
+AssertionError: Policy cogames.policy.starter_agent.StarterPolicy must be trainable (network() returned None)

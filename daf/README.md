@@ -1,10 +1,13 @@
 # DAF: Distributed Agent Framework
 
-DAF extends CoGames with distributed training, evaluation, and analysis infrastructure for agent policies. It provides hyperparameter sweeps, policy comparisons, distributed training orchestration, and comprehensive visualization and reporting.
+DAF extends CoGames with distributed training, evaluation, and analysis infrastructure for agent policies. It provides hyperparameter sweeps, policy comparisons, CogsGuard mission analysis, VOR-based scoring, authentication integration, and comprehensive visualization and reporting.
+
+> **v2.1.0**: Added CogsGuard mission support, authentication integration, `metta_alo` scoring, policy framework analysis, VOR comparison, variant sweeps, and tournament submission workflow.
 
 ## Key Features
 
 ### 1. **Hyperparameter Sweeps** (`sweeps.py`)
+
 Grid/random search over policy hyperparameters with result tracking.
 
 ```python
@@ -17,35 +20,40 @@ best = sweeps.daf_sweep_best_config(results)
 ```
 
 ### 2. **Policy Comparison** (`comparison.py`)
+
 Statistical analysis and pairwise comparison of multiple policies.
 
 ```python
 from daf import comparison
 
 results = comparison.daf_compare_policies(
-    policies=["lstm", "baseline", "random"],
-    missions=["training_facility_1"],
+    policies=["cogames.policy.starter_agent.StarterPolicy", "cogames.policy.tutorial_policy.TutorialPolicy"],
+    missions=["cogsguard_machina_1.basic"],
     episodes_per_mission=10,
 )
 print(results.summary_statistics)
 ```
 
 ### 3. **Distributed Training** (`distributed_training.py`)
+
 Multi-machine training orchestration with automatic synchronization.
 
 ```python
 from daf import distributed_training
+import torch
 
 job = distributed_training.daf_launch_distributed_training(
-    policy_class_path="lstm",
-    mission_name="training_facility_1",
-    num_machines=4,
-    steps_per_machine=250_000,
+    env_cfg=env_cfg,  # From get_mission()
+    policy_class_path="cogames.policy.tutorial_policy.TutorialPolicy",
+    device=torch.device("cuda" if torch.cuda.is_available() else "cpu"),
+    num_steps=250_000,
 )
-final_checkpoint = job.wait_for_completion()
+# Returns DistributedTrainingResult, not a job object in v2.2
+print(f"Training complete: {job.status}")
 ```
 
 ### 4. **Organized Output Management** (`output_manager.py`)
+
 **New in v2**: Centralized output organization with structured subfolders for all operations.
 
 ```python
@@ -63,6 +71,7 @@ output_mgr.save_json_results(
 ```
 
 ### 5. **Structured Logging** (`logging_config.py`)
+
 **New in v2**: Enhanced logging with operation tracking and metrics collection.
 
 ```python
@@ -78,6 +87,7 @@ logger.print_metrics_summary()
 ```
 
 ### 6. **Unified Test Runner** (`test_runner.py`)
+
 **New in v2**: Execute all tests with organized output and reporting.
 
 ```python
@@ -93,6 +103,7 @@ runner.print_test_summary()
 ```
 
 ### 7. **Report Generation** (`generate_test_report.py`)
+
 **New in v2**: Generate comprehensive test reports from saved outputs.
 
 ```bash
@@ -103,6 +114,7 @@ python daf/src/generate_test_report.py \
 ```
 
 ### 8. **Visualization** (`visualization.py`)
+
 Generate HTML reports and dashboards for comparison results.
 
 ```python
@@ -116,6 +128,7 @@ visualization.daf_export_comparison_html(
 ```
 
 ### 9. **Mission Analysis** (`mission_analysis.py`)
+
 Per-mission performance analysis and failure mode detection.
 
 ```python
@@ -123,13 +136,14 @@ from daf import mission_analysis
 
 analysis = mission_analysis.daf_analyze_mission_performance(
     policy_class_path="lstm",
-    mission_name="assembler_2",
+    mission_name="cogsguard_machina_1",
     episodes=20,
 )
 print(f"Success rate: {analysis.success_rate}")
 ```
 
 ### 10. **Environment Checks** (`environment_checks.py`)
+
 Pre-flight validation and device optimization.
 
 ```python
@@ -163,19 +177,22 @@ Each operation is organized by session ID (`YYYYMMDD_HHMMSS`) for reproducibilit
 
 | Module | Purpose |
 |--------|---------|
-| `config.py` | Configuration management (DAFConfig, DAFSweepConfig, etc.) |
-| `output_manager.py` | **[NEW]** Centralized output directory management |
-| `logging_config.py` | **[NEW]** Structured logging with metrics tracking |
-| `test_runner.py` | **[NEW]** Unified test execution framework |
-| `sweeps.py` | Hyperparameter sweep execution and analysis |
-| `comparison.py` | Policy comparison and statistical testing |
+| `config.py` | Configuration management (DAFConfig, DAFSweepConfig, DAFTournamentConfig, DAFVariantConfig) |
+| `output_manager.py` | Centralized output directory management |
+| `logging_config.py` | Structured logging with metrics tracking |
+| `test_runner.py` | Unified test execution framework |
+| `sweeps.py` | Hyperparameter sweep execution, variant sweeps |
+| `comparison.py` | Policy comparison, statistical testing, VOR comparison |
 | `training.py` | Policy training orchestration |
 | `distributed_training.py` | Multi-machine training coordination |
-| `deployment.py` | Policy packaging and deployment |
-| `mission_analysis.py` | Per-mission performance analysis |
+| `deployment.py` | Policy packaging, deployment, tournament submission |
+| `mission_analysis.py` | CogsGuard mission analysis, variant discovery |
 | `visualization.py` | HTML reports and dashboards |
-| `environment_checks.py` | Environment validation and optimization |
-| `generate_test_report.py` | **[NEW]** Test report generation from outputs |
+| `environment_checks.py` | Environment validation, auth checks |
+| `auth_integration.py` | **[NEW 2.1]** OAuth2 authentication wrapper |
+| `scoring_analysis.py` | **[NEW 2.1]** `metta_alo` scoring (VOR, weighted scores) |
+| `policy_analysis.py` | **[NEW 2.1]** Policy framework discovery/comparison |
+| `generate_test_report.py` | Test report generation from outputs |
 
 ## Quick Start
 
@@ -254,6 +271,7 @@ python -m pytest daf/tests/ --cov=daf/src
 ```
 
 Test outputs are organized in `daf_output/evaluations/tests/`:
+
 - `cogames/` - CoGames framework tests
 - `daf/` - DAF module tests
 - `test_report.json` - Structured results
@@ -299,12 +317,14 @@ objective_metric: avg_reward
 ## Best Practices
 
 1. **Always use OutputManager** for consistent organization:
+
    ```python
    output_mgr = get_output_manager()
    output_mgr.log_operation_start("sweep")
    ```
 
 2. **Create loggers for experiments**:
+
    ```python
    logger = create_daf_logger("experiment_name")
    with logger.track_operation("training"):
@@ -312,16 +332,19 @@ objective_metric: avg_reward
    ```
 
 3. **Save session metadata** when done:
+
    ```python
    output_mgr.save_session_metadata()
    ```
 
 4. **Generate reports immediately** after runs:
+
    ```bash
    python daf/src/generate_test_report.py daf_output/evaluations/tests
    ```
 
 5. **Clean up old sessions periodically**:
+
    ```bash
    find daf_output -type d -name "20*" -mtime +30 -exec rm -rf {} +
    ```
@@ -337,22 +360,29 @@ objective_metric: avg_reward
 ## Troubleshooting
 
 ### Output not being saved?
+
 Check that `organize_by_operation=True` in DAFConfig and output manager is initialized.
 
 ### Tests not collecting outputs?
+
 Ensure test script uses output manager:
+
 ```bash
 python -m pytest tests/ -v 2>&1 | tee "$OUTPUT_DIR/test.txt"
 ```
 
 ### Logs not appearing?
+
 Enable logging:
+
 ```python
 output_mgr = get_output_manager(verbose=True, log_to_file=True)
 ```
 
 ### Reports not generating?
+
 Run report generator:
+
 ```bash
 python daf/src/generate_test_report.py ./daf_output/evaluations/tests
 ```
@@ -360,6 +390,7 @@ python daf/src/generate_test_report.py ./daf_output/evaluations/tests
 ## Version History
 
 ### v2.0 (Current)
+
 - **New**: Centralized OutputManager for organized outputs
 - **New**: Structured logging with DAFLogger
 - **New**: Unified TestRunner for test execution
@@ -368,6 +399,7 @@ python daf/src/generate_test_report.py ./daf_output/evaluations/tests
 - **Improved**: Structured session metadata tracking
 
 ### v1.0
+
 - Initial DAF implementation with core modules
 
 ## Contributing

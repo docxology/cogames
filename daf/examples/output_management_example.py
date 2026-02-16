@@ -9,9 +9,9 @@ Demonstrates:
 
 from pathlib import Path
 
-from daf.logging_config import DAFLogger, create_daf_logger
-from daf.output_manager import OutputManager, get_output_manager
-from daf.test_runner import TestRunner
+from daf.src.core.logging_config import DAFLogger, create_daf_logger
+from daf.src.core.output_manager import OutputManager, get_output_manager
+from daf.src.testing.test_runner import TestRunner
 
 
 def example_output_manager():

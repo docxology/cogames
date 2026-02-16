@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from daf.src.comparison import ComparisonReport, PolicyComparisonResult, daf_benchmark_suite, daf_compare_policies
+from daf.src.eval.comparison import ComparisonReport, PolicyComparisonResult, daf_benchmark_suite, daf_compare_policies
 
 
 def test_policy_comparison_result_creation():
@@ -146,13 +146,16 @@ def test_comparison_report_save_json(tmp_path):
 
 def test_daf_compare_policies_with_real_mission(tmp_path, safe_mission_loader):
     """Test daf_compare_policies with real mission."""
-    from mettagrid.policy.policy import PolicySpec
+    try:
+        from mettagrid.policy.policy import PolicySpec
+    except ImportError:
+        pytest.skip("mettagrid not installed")
 
     # Use fixture for safe mission loading
-    mission_name, env_cfg = safe_mission_loader("training_facility_1")
+    mission_name, env_cfg = safe_mission_loader("cogsguard_machina_1.basic")
     missions = [(mission_name, env_cfg)]
 
-    policy_specs = [PolicySpec(class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy")]
+    policy_specs = [PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy")]
 
     report = daf_compare_policies(
         policies=policy_specs,
@@ -166,10 +169,13 @@ def test_daf_compare_policies_with_real_mission(tmp_path, safe_mission_loader):
 
 def test_daf_benchmark_suite():
     """Test benchmark suite execution."""
-    from mettagrid.policy.policy import PolicySpec
+    try:
+        from mettagrid.policy.policy import PolicySpec
+    except ImportError:
+        pytest.skip("mettagrid not installed")
 
     policy_specs = [
-        PolicySpec(class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy")
+        PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy")
     ]
 
     try:
@@ -217,13 +223,16 @@ class TestComparisonIntegration:
 
     def test_comparison_workflow(self, tmp_path, safe_mission_loader):
         """Test complete comparison workflow."""
-        from mettagrid.policy.policy import PolicySpec
+        try:
+            from mettagrid.policy.policy import PolicySpec
+        except ImportError:
+            pytest.skip("mettagrid not installed")
 
         # Use fixture for safe mission loading
-        mission_name, env_cfg = safe_mission_loader("training_facility_1")
+        mission_name, env_cfg = safe_mission_loader("cogsguard_machina_1.basic")
         missions = [(mission_name, env_cfg)]
 
-        policy_specs = [PolicySpec(class_path="cogames.policy.scripted_agent.baseline_agent.BaselinePolicy")]
+        policy_specs = [PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy")]
 
         report = daf_compare_policies(
             policies=policy_specs,

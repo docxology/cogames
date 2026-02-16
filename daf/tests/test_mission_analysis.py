@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from daf.src.mission_analysis import (
+from daf.src.eval.mission_analysis import (
     MissionAnalysis,
     daf_analyze_mission,
     daf_analyze_mission_set,

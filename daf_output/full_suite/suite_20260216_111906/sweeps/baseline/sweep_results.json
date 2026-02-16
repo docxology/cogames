@@ -1,0 +1,94 @@
+{
+  "sweep_name": "baseline_sweep",
+  "objective_metric": "total_reward",
+  "optimize_direction": "maximize",
+  "start_time": "2026-02-16T11:19:36.728789",
+  "end_time": "2026-02-16T11:19:36.734008",
+  "num_trials": 6,
+  "trials": [
+    {
+      "trial_id": 1,
+      "hyperparameters": {
+        "learning_rate": 0.0001,
+        "hidden_size": 64
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {},
+      "success": false,
+      "timestamp": "2026-02-16T11:19:36.731837"
+    },
+    {
+      "trial_id": 2,
+      "hyperparameters": {
+        "learning_rate": 0.0001,
+        "hidden_size": 128
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {},
+      "success": false,
+      "timestamp": "2026-02-16T11:19:36.732363"
+    },
+    {
+      "trial_id": 3,
+      "hyperparameters": {
+        "learning_rate": 0.001,
+        "hidden_size": 64
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {},
+      "success": false,
+      "timestamp": "2026-02-16T11:19:36.732795"
+    },
+    {
+      "trial_id": 4,
+      "hyperparameters": {
+        "learning_rate": 0.001,
+        "hidden_size": 128
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {},
+      "success": false,
+      "timestamp": "2026-02-16T11:19:36.733202"
+    },
+    {
+      "trial_id": 5,
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "hidden_size": 64
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {},
+      "success": false,
+      "timestamp": "2026-02-16T11:19:36.733604"
+    },
+    {
+      "trial_id": 6,
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "hidden_size": 128
+      },
+      "primary_metric": 0.0,
+      "all_metrics": {
+        "total_reward": 0.0
+      },
+      "mission_results": {},
+      "success": false,
+      "timestamp": "2026-02-16T11:19:36.734002"
+    }
+  ]
+}

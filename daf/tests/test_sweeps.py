@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from daf.src.sweeps import (
+from daf.src.eval.sweeps import (
     SweepResult,
     SweepTrialResult,
     daf_grid_search,

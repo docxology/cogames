@@ -15,7 +15,7 @@ Single-node and multi-node training coordination.
 
 ## Key Functions
 
-- `daf_launch_distributed_training()` - Training launcher
+- `daf_launch_distributed_training(env_cfg, policy_class_path, device, num_steps)` - Training launcher
 - `daf_create_training_cluster()` - Cluster setup
 - `daf_get_training_status()` - Status tracking
 

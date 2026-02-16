@@ -24,6 +24,7 @@ config = DAFConfig(
 ```
 
 **Attributes:**
+
 - `output_dir`: Output directory for results (default: `./daf_output`)
 - `checkpoint_dir`: Directory for checkpoints (default: `./daf_output/checkpoints`)
 - `max_checkpoints_to_keep`: Max checkpoints per run (default: 5)
@@ -46,11 +47,13 @@ config = DAFSweepConfig.from_yaml("sweep.yaml")
 ```
 
 **Methods:**
+
 - `from_yaml(path)`: Load from YAML file
 - `from_json(path)`: Load from JSON file
 - `to_yaml(path)`: Save to YAML file
 
 **Attributes:**
+
 - `name`: Sweep name
 - `missions`: List of mission names/paths
 - `policy_class_path`: Policy class path
@@ -66,6 +69,7 @@ config = DAFSweepConfig.from_yaml("sweep.yaml")
 Policy deployment configuration.
 
 **Attributes:**
+
 - `policy_name`: Human-readable name
 - `policy_class_path`: Policy class path
 - `weights_path`: Path to weights/checkpoint
@@ -80,6 +84,7 @@ Policy deployment configuration.
 Policy comparison configuration.
 
 **Attributes:**
+
 - `name`: Comparison name
 - `policies`: List of policy class paths
 - `missions`: List of missions
@@ -92,6 +97,7 @@ Policy comparison configuration.
 Workflow orchestration configuration.
 
 **Attributes:**
+
 - `name`: Pipeline name
 - `stages`: Ordered list of stages
 - `stop_on_failure`: Stop on error (default: True)
@@ -118,6 +124,7 @@ config = daf_load_config("daf_config.yaml")
 Container for environment check results.
 
 **Methods:**
+
 - `add_check(name, passed, warning=None, info=None)`: Record check result
 - `add_error(name, error_msg)`: Record check error
 - `is_healthy()`: Return True if all checks passed
@@ -140,10 +147,12 @@ if result.is_healthy():
 ```
 
 **Platform Detection:**
+
 - **macOS**: Checks MPS (Metal Performance Shaders) for Apple Silicon GPUs
 - **Linux/Windows**: Checks CUDA for NVIDIA GPUs
 
 **Returns:**
+
 - `EnvironmentCheckResult` with GPU backend info in `result.info["gpu_backend"]`
 
 #### `daf_check_cuda_availability(console=None) → EnvironmentCheckResult`
@@ -190,6 +199,7 @@ print(result.summary())  # "Environment Check: HEALTHY (16/16 checks passed)"
 ```
 
 **Checks Performed:**
+
 - GPU availability (MPS on macOS, CUDA on Linux/Windows)
 - Disk space for checkpoints
 - Required package dependencies
@@ -219,12 +229,14 @@ device = daf_get_recommended_device()
 Results from a distributed training run.
 
 **Attributes:**
+
 - `final_checkpoint`: Path to final checkpoint
 - `training_steps`: Total steps completed
 - `wall_time_seconds`: Total wall time
 - `num_workers`: Number of workers used
 
 **Methods:**
+
 - `training_rate()`: Get steps per second
 
 ### Functions
@@ -267,6 +279,7 @@ Get current training status and latest checkpoint info.
 Result from a single sweep trial.
 
 **Attributes:**
+
 - `trial_id`: Trial identifier
 - `hyperparameters`: Parameter dict
 - `primary_metric`: Objective metric value
@@ -278,6 +291,7 @@ Result from a single sweep trial.
 Results from complete hyperparameter sweep.
 
 **Methods:**
+
 - `add_trial(trial)`: Add trial result
 - `get_best_trial()`: Get best performing trial
 - `get_worst_trial()`: Get worst performing trial
@@ -335,6 +349,7 @@ Get sweep status from results file.
 Results from comparing two policies.
 
 **Attributes:**
+
 - `policy_a_name`: First policy name
 - `policy_b_name`: Second policy name
 - `avg_reward_a`: Average reward/score for policy A
@@ -344,6 +359,7 @@ Results from comparing two policies.
 - `effect_size`: Cohen's d effect size
 
 **Methods:**
+
 - `summary_string()`: Get human-readable summary
 
 #### `ComparisonReport`
@@ -351,15 +367,18 @@ Results from comparing two policies.
 Complete report from multi-policy comparison.
 
 **Methods:**
+
 - `add_policy_results(policy_name, mission_rewards)`: Add policy results
 - `compute_pairwise_comparisons(significance_level=0.05)`: Run statistical tests
 - `print_summary(console)`: Print to console
 - `save_json(path)`: Save to JSON file (includes `detailed_metrics` if available)
 
 **Attributes:**
+
 - `policy_detailed_metrics`: Dict of policy → mission → agent metrics (resources, actions, etc.)
 
 **Properties:**
+
 - `summary_statistics`: Dict of policy statistics
 
 ### Functions
@@ -388,6 +407,7 @@ print(report.policy_detailed_metrics['baseline']['training_facility_1'])
 ```
 
 **Parameters:**
+
 - `policies`: List of PolicySpec objects to compare
 - `missions`: List of (mission_name, env_config) tuples
 - `episodes_per_mission`: Episodes to run per mission (default: 5)
@@ -395,6 +415,7 @@ print(report.policy_detailed_metrics['baseline']['training_facility_1'])
 
 **Performance Score Computation:**
 When environments return zero rewards, DAF computes a meaningful performance score from agent metrics:
+
 - Resources gained (carbon, silicon, oxygen, germanium, energy)
 - Inventory diversity (weighted higher)
 - Successful actions (movement)
@@ -429,6 +450,7 @@ daf_plot_policy_comparison(comparison_report)
 ```
 
 **Generated Files:**
+
 - `policy_rewards_comparison.png` - Bar chart of overall performance
 - `performance_by_mission.png` - Grouped bars per mission
 - `reward_distributions.png` - Violin plots of score distributions
@@ -445,6 +467,7 @@ daf_plot_detailed_metrics_comparison(comparison_report, output_dir="comparisons/
 ```
 
 **Generated Files:**
+
 - `metrics_resources_gained.png` - Bar chart: carbon, silicon, oxygen, germanium gained
 - `metrics_resources_held.png` - Bar chart: current resource amounts
 - `metrics_energy.png` - Bar chart: energy amount, gained, lost
@@ -454,6 +477,7 @@ daf_plot_detailed_metrics_comparison(comparison_report, output_dir="comparisons/
 - `action_distribution.png` - Pie charts: action type distribution per policy
 
 **Metric Categories Plotted:**
+
 - **Resources Gained**: carbon.gained, silicon.gained, oxygen.gained, germanium.gained
 - **Resources Held**: carbon.amount, silicon.amount, oxygen.amount, germanium.amount
 - **Energy**: energy.amount, energy.gained, energy.lost
@@ -465,6 +489,7 @@ daf_plot_detailed_metrics_comparison(comparison_report, output_dir="comparisons/
 Generate plots from sweep results.
 
 **Generated Files:**
+
 - `sweep_progress.png` - Trial performance over time
 - `best_configuration.png` - Best hyperparameter configuration
 - `hyperparameter_importance.png` - Correlation with performance
@@ -482,6 +507,7 @@ Generate parallel coordinates plot for hyperparameter exploration.
 Export comparison report as interactive HTML. Includes detailed metrics tables when `policy_detailed_metrics` is available.
 
 **HTML Sections:**
+
 - Summary statistics with rankings
 - Pairwise statistical comparisons
 - Detailed agent metrics tables (Resources, Energy, Actions, Inventory, Status)
@@ -495,6 +521,7 @@ Generate policy leaderboard table in Markdown format.
 Generate comprehensive dashboard with multiple visualizations.
 
 **Generated Files:**
+
 - `dashboard.html` - Interactive summary dashboard
 - All sweep/comparison plots in subdirectories
 
@@ -507,6 +534,7 @@ Generate comprehensive dashboard with multiple visualizations.
 Result from a deployment operation.
 
 **Attributes:**
+
 - `policy_name`: Policy name
 - `version`: Version string
 - `status`: "success", "validation_failed", or "deployment_failed"
@@ -553,6 +581,7 @@ Rollback deployment to previous version.
 Result from orchestrated pipeline execution.
 
 **Attributes:**
+
 - `pipeline_name`: Pipeline name
 - `status`: "success", "failed", or "partial"
 - `stages_completed`: List of completed stages
@@ -562,6 +591,7 @@ Result from orchestrated pipeline execution.
 - `total_time_seconds`: Total execution time
 
 **Methods:**
+
 - `is_success()`: Return True if all stages completed
 
 ### Functions
@@ -592,6 +622,88 @@ Complete policy comparison workflow orchestrator.
 
 Standardized benchmark orchestrator.
 
+## Authentication Module (`daf.auth_integration`) — *New in v2.1*
+
+### Functions
+
+#### `daf_login(server_url="https://cogames.ai") → dict`
+
+Perform OAuth2 login using cogames.auth. Returns status dict.
+
+#### `daf_check_auth_status(server_url="https://cogames.ai") → dict`
+
+Check authentication status without login. Returns `{authenticated, server_url, token_path}`.
+
+#### `daf_get_auth_token(server_url="https://cogames.ai") → str | None`
+
+Retrieve saved auth token, or None if not authenticated.
+
+## Scoring Module (`daf.scoring_analysis`) — *New in v2.1*
+
+### Functions
+
+#### `daf_compute_vor(candidate_scores, pool_scores) → dict`
+
+Compute Value Over Replacement. Returns `{vor, candidate_mean, pool_mean}`.
+
+#### `daf_compute_weighted_score(scores, weights) → dict`
+
+Compute weighted score across missions. Returns `{weighted_score, per_mission}`.
+
+#### `daf_allocate_agents(weights, total_count) → dict`
+
+Allocate agent counts by weighted proportions. Returns `{allocation, total}`.
+
+#### `daf_validate_proportions(proportions) → dict`
+
+Validate proportions sum to 1.0. Returns `{valid, sum, proportions}`.
+
+#### `daf_scoring_summary(candidate_scores, pool_scores, weights) → dict`
+
+Comprehensive scoring summary combining VOR, weighted scores, allocation.
+
+## Policy Analysis Module (`daf.policy_analysis`) — *New in v2.1*
+
+### Functions
+
+#### `daf_list_available_policies() → list[dict]`
+
+Discover all policy classes in `cogames.policy`. Returns list of `{name, module, doc}`.
+
+#### `daf_analyze_policy(policy_name) → dict`
+
+Analyze a policy's architecture. Returns `{name, bases, methods, parameters}`.
+
+#### `daf_compare_policy_architectures(policy_names) → dict`
+
+Compare multiple policy architectures side by side.
+
+## New Functions in Existing Modules (v2.1)
+
+### Comparison
+
+#### `daf_compare_with_vor(candidate_spec, pool_specs, missions, episodes=5) → dict`
+
+VOR-based comparison of candidate vs pool. Returns `{vor, candidate_mean, pool_mean}`.
+
+### Sweeps
+
+#### `daf_variant_sweep(policy_spec, base_mission, variant_names, episodes=5) → SweepResult`
+
+Sweep over mission variants to compare policy performance across configurations.
+
+### Deployment
+
+#### `daf_submit_policy(policy_class_path, weights_path, server_url, season, ...) → DeploymentResult`
+
+Submit policy to CoGames tournament via cogames.cli.submit.
+
+### Environment Checks
+
+#### `daf_check_auth(server_url="https://cogames.ai") → EnvironmentCheckResult`
+
+Check if authentication token exists for the given server.
+
 ## Error Handling
 
 All DAF functions raise standard Python exceptions:
@@ -613,6 +725,7 @@ logger = logging.getLogger("daf")
 ```
 
 DAF uses loggers in these modules:
+
 - `daf.environment_checks`
 - `daf.distributed_training`
 - `daf.sweeps`
@@ -620,4 +733,6 @@ DAF uses loggers in these modules:
 - `daf.visualization`
 - `daf.deployment`
 - `daf.orchestrators`
-
+- `daf.auth_integration`
+- `daf.scoring_analysis`
+- `daf.policy_analysis`

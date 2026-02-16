@@ -1,0 +1,12 @@
+{
+  "generated": "2026-02-16T11:19:36.601913",
+  "leaderboard": [
+    {
+      "rank": 1,
+      "policy": "StarterPolicy",
+      "avg_reward": 30502.53,
+      "std_dev": 2262.036046872374,
+      "missions_evaluated": 1
+    }
+  ]
+}

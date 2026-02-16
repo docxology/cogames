@@ -94,7 +94,7 @@ def comparison_pipeline(
 
     # Stage 2: Comparison
     try:
-        from daf.src.comparison import daf_compare_policies
+        from daf.src.eval.comparison import daf_compare_policies
 
         comparison_results = daf_compare_policies(
             policies=policy_specs,
@@ -150,7 +150,7 @@ def comparison_pipeline(
     # Stage 4: HTML Report
     if generate_html_report and output_dir:
         try:
-            from daf.src.visualization import daf_export_comparison_html
+            from daf.src.viz.visualization import daf_export_comparison_html
 
             html_path = output_dir / "comparison_report.html"
             daf_export_comparison_html(

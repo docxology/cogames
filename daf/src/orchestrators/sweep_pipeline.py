@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any, Optional
 from daf.src.orchestrators import PipelineResult
 
 if TYPE_CHECKING:
-    from daf.src.config import DAFSweepConfig
+    from daf.src.core.config import DAFSweepConfig
 
 
 def sweep_pipeline(
@@ -88,7 +88,7 @@ def sweep_pipeline(
 
     # Stage 2: Sweep
     try:
-        from daf.src.sweeps import daf_launch_sweep
+        from daf.src.eval.sweeps import daf_launch_sweep
 
         sweep_results = daf_launch_sweep(sweep_config)
         outputs["sweep"] = {

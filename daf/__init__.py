@@ -3,42 +3,42 @@
 Provides distributed training, evaluation, and analysis infrastructure
 for agent policies in the Cogs vs Clips cooperative game environment.
 
+Subpackages:
+    daf.src.core          Configuration, logging, output management
+    daf.src.eval          Policy comparison, sweeps, mission/scoring/policy analysis
+    daf.src.train         Distributed training, deployment, authentication
+    daf.src.viz           Visualization dashboards, GIF rendering
+    daf.src.testing       Test runner, report generation
+    daf.src.orchestrators Pipeline orchestration
+
 Usage:
-    from daf import sweeps, comparison, environment_checks
-    from daf.config import DAFSweepConfig, DAFConfig
-    from daf.orchestrators import daf_run_training_pipeline
+    from daf.src.core import DAFConfig, DAFSweepConfig
+    from daf.src.eval import daf_compare_policies, daf_launch_sweep
+    from daf.src.train import daf_launch_distributed_training, daf_deploy_policy
+    from daf.src.viz import daf_plot_policy_comparison
+    from daf.src.testing import TestRunner
+    from daf.src.orchestrators import daf_run_training_pipeline
 
 Note:
     Most modules require cogames and mettagrid to be installed.
-    Import individual modules as needed to avoid loading all dependencies.
+    Import individual subpackages as needed to avoid loading all dependencies.
 """
 
 from __future__ import annotations
 
-# Lazy imports using module-level __getattr__ for cleaner import experience
-# This avoids loading all heavy dependencies at import time
-
 _SUBMODULE_MAPPING = {
-    # Core modules
-    "sweeps": "daf.src.sweeps",
-    "comparison": "daf.src.comparison",
-    "deployment": "daf.src.deployment",
-    "distributed_training": "daf.src.distributed_training",
-    "environment_checks": "daf.src.environment_checks",
-    "mission_analysis": "daf.src.mission_analysis",
-    "visualization": "daf.src.visualization",
-    # Infrastructure modules
-    "config": "daf.src.config",
-    "output_manager": "daf.src.output_manager",
-    "output_utils": "daf.src.output_utils",
-    "logging_config": "daf.src.logging_config",
-    "test_runner": "daf.src.test_runner",
+    "core": "daf.src.core",
+    "eval": "daf.src.eval",
+    "train": "daf.src.train",
+    "viz": "daf.src.viz",
+    "testing": "daf.src.testing",
     "orchestrators": "daf.src.orchestrators",
+    "environment_checks": "daf.src.environment_checks",
 }
 
 
 def __getattr__(name: str):
-    """Lazy import of submodules."""
+    """Lazy import of subpackages."""
     if name in _SUBMODULE_MAPPING:
         import importlib
 
@@ -54,23 +54,15 @@ def __dir__():
     return list(_SUBMODULE_MAPPING.keys()) + ["__version__"]
 
 
-__version__ = "2.0.0"
+__version__ = "2.2.0"
 
 __all__ = [
-    # Modules (accessed via daf.sweeps, daf.comparison, etc.)
-    "sweeps",
-    "comparison",
-    "deployment",
-    "distributed_training",
-    "environment_checks",
-    "mission_analysis",
-    "visualization",
-    "config",
-    "output_manager",
-    "output_utils",
-    "logging_config",
-    "test_runner",
+    "core",
+    "eval",
+    "train",
+    "viz",
+    "testing",
     "orchestrators",
-    # Version
+    "environment_checks",
     "__version__",
 ]

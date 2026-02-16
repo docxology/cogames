@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from daf.src.config import (
+from daf.src.core.config import (
     DAFConfig,
     DAFComparisonConfig,
     DAFDeploymentConfig,

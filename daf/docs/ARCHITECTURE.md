@@ -33,13 +33,17 @@ DAF follows these core principles:
 **Purpose**: Define all configuration schemas using Pydantic models
 
 **Key Classes**:
+
 - `DAFConfig` - Global settings for all DAF operations
 - `DAFSweepConfig` - Hyperparameter sweep definitions
-- `DAFDeploymentConfig` - Deployment pipeline settings
+- `DAFDeploymentConfig` - Deployment pipeline settings (with tournament/season support)
 - `DAFComparisonConfig` - Policy comparison setup
 - `DAFPipelineConfig` - Multi-stage workflow definitions
+- `DAFTournamentConfig` - *[NEW 2.1]* Tournament server and season settings
+- `DAFVariantConfig` - *[NEW 2.1]* Mission variant configuration
 
 **Design Pattern**:
+
 - Pydantic models for validation and type safety
 - YAML/JSON loading and saving
 - Environment variable support via ConfigDict
@@ -50,14 +54,17 @@ DAF follows these core principles:
 **Purpose**: Verify environment is suitable before operations
 
 **Key Components**:
+
 - `EnvironmentCheckResult` - Container for check results
 - `daf_check_cuda_availability()` - GPU/CUDA verification
 - `daf_check_disk_space()` - Storage validation
 - `daf_check_dependencies()` - Package availability
 - `daf_check_mission_configs()` - Mission loadability
+- `daf_check_auth()` - *[NEW 2.1]* Authentication token verification
 - `daf_check_environment()` - Comprehensive check
 
 **Design Pattern**:
+
 - Accumulate results without early termination
 - Generate both human-readable and structured output
 - Use Rich console for professional formatting
@@ -70,6 +77,7 @@ DAF follows these core principles:
 **Purpose**: Wrap cogames.train.train() with distributed coordination
 
 **Key Components**:
+
 - `DistributedTrainingResult` - Training outcome container
 - `daf_launch_distributed_training()` - Multi-node orchestration
 - `daf_create_training_cluster()` - Resource initialization
@@ -77,6 +85,7 @@ DAF follows these core principles:
 - `daf_get_training_status()` - Status tracking
 
 **Design Pattern**:
+
 - Single-node defaults to cogames.train.train() directly
 - Multi-node defers to specific backends (Ray, Dask, torch.distributed)
 - Checkpoint discovery via mettagrid.policy.loader
@@ -87,13 +96,18 @@ DAF follows these core principles:
 **Purpose**: Hyperparameter search with multiple strategies
 
 **Key Components**:
+
 - `SweepTrialResult` - Single trial outcome
 - `SweepResult` - Complete sweep results container
 - `daf_grid_search()` - Cartesian product of parameters
 - `daf_random_search()` - Uniform random sampling
 - `daf_launch_sweep()` - Sweep execution orchestrator
+- `daf_sweep_best_config()` - Extract best configuration from results
+- `daf_sweep_status()` - Load sweep status from disk
+- `daf_variant_sweep()` - *[NEW 2.1]* Sweep over mission variants
 
 **Design Pattern**:
+
 - Grid/random search configuration generation
 - Uses cogames.evaluate.evaluate() for assessment
 - Collects per-mission and aggregated metrics
@@ -105,13 +119,16 @@ DAF follows these core principles:
 **Purpose**: Policy head-to-head evaluation with statistics
 
 **Key Components**:
+
 - `PolicyComparisonResult` - Two-policy comparison result
 - `ComparisonReport` - Multi-policy comparison container
 - `daf_compare_policies()` - Run comparison
 - `daf_policy_ablation()` - Component ablation studies
 - `daf_benchmark_suite()` - Standardized benchmarks
+- `daf_compare_with_vor()` - *[NEW 2.1]* VOR-based policy comparison via `cogames.pickup`
 
 **Design Pattern**:
+
 - Uses scipy.stats for statistical tests (t-test, effect size)
 - Per-mission and aggregated performance tracking
 - Pairwise statistical significance testing
@@ -123,6 +140,7 @@ DAF follows these core principles:
 **Purpose**: Plotting and report generation
 
 **Key Components**:
+
 - `daf_plot_training_curves()` - Training progress visualization
 - `daf_plot_policy_comparison()` - Comparison plots
 - `daf_plot_sweep_results()` - Sweep progress and best config
@@ -130,6 +148,7 @@ DAF follows these core principles:
 - `daf_generate_leaderboard()` - Policy ranking tables
 
 **Design Pattern**:
+
 - Matplotlib for static plots (extending scripts/run_evaluation.py patterns)
 - HTML generation without external template engines
 - Optional if matplotlib not available (non-blocking)
@@ -141,14 +160,17 @@ DAF follows these core principles:
 **Purpose**: Policy packaging, validation, and deployment
 
 **Key Components**:
+
 - `DeploymentResult` - Deployment operation outcome
 - `daf_package_policy()` - Create portable bundles
 - `daf_validate_deployment()` - Smoke testing
 - `daf_deploy_policy()` - Upload to endpoint
 - `daf_monitor_deployment()` - Performance tracking
 - `daf_rollback_deployment()` - Version rollback
+- `daf_submit_policy()` - *[NEW 2.1]* Tournament submission via `cogames.cli.submit`
 
 **Design Pattern**:
+
 - Tarball packaging with metadata.json
 - Uses patterns from cogames.cli.submit
 - Isolated validation using cogames.evaluate.evaluate()
@@ -160,12 +182,14 @@ DAF follows these core principles:
 **Purpose**: Chain modules into complete workflows
 
 **Key Functions**:
+
 - `daf_run_training_pipeline()` - Training workflow
 - `daf_run_sweep_pipeline()` - Sweep workflow
 - `daf_run_comparison_pipeline()` - Comparison workflow
 - `daf_run_benchmark_pipeline()` - Benchmark workflow
 
 **Design Pattern**:
+
 - Stage-based pipeline with error handling
 - Collect results from each stage
 - Stop-on-failure or continue options
@@ -173,11 +197,38 @@ DAF follows these core principles:
 - Total execution time tracking
 - Comprehensive result reporting
 
-### Layer 5: CLI Integration
+### Layer 5: v2.1 Integration Modules
+
+#### `auth_integration.py` *[NEW 2.1]*
+
+**Purpose**: OAuth2 authentication wrapper for DAF workflows
+
+**Key Functions**: `daf_login()`, `daf_check_auth_status()`, `daf_get_auth_token()`
+
+**Wraps**: `cogames.auth.BaseCLIAuthenticator`
+
+#### `scoring_analysis.py` *[NEW 2.1]*
+
+**Purpose**: Scoring utilities for VOR and weighted metrics
+
+**Key Functions**: `daf_compute_vor()`, `daf_compute_weighted_score()`, `daf_allocate_agents()`, `daf_validate_proportions()`
+
+**Wraps**: `metta_alo.scoring`
+
+#### `policy_analysis.py` *[NEW 2.1]*
+
+**Purpose**: Policy framework discovery and architecture analysis
+
+**Key Functions**: `daf_list_available_policies()`, `daf_analyze_policy()`, `daf_compare_policy_architectures()`
+
+**Wraps**: `cogames.policy.*`
+
+### Layer 6: CLI Integration
 
 **Location**: Extended in `src/cogames/main.py`
 
 **Commands Added**:
+
 ```
 cogames daf-check                    # Environment validation
 cogames daf-train                    # Distributed training
@@ -262,8 +313,11 @@ Each DAF module wraps or extends CoGames functionality:
 - **sweeps.py**: Uses `cogames.evaluate.evaluate()` for hyperparameter assessment
 - **comparison.py**: Uses `cogames.evaluate.evaluate()` for policy comparison
 - **environment_checks.py**: Uses `cogames.device.resolve_training_device()` for device validation
-- **mission_analysis.py**: Uses `cogames.cli.mission.get_mission_name_and_config()` for discovery
-- **deployment.py**: Uses `cogames.auth` and `cogames.cli.submit` patterns
+- **mission_analysis.py**: Uses `cogames.cli.mission.get_mission()` for discovery
+- **deployment.py**: Uses `cogames.auth`, `cogames.cli.submit` for tournament submissions
+- **auth_integration.py**: Wraps `cogames.auth.BaseCLIAuthenticator` for OAuth2
+- **scoring_analysis.py**: Wraps `metta_alo.scoring` for VOR and weighted metrics
+- **policy_analysis.py**: Wraps `cogames.policy.*` for architecture discovery
 
 ### Patterns Borrowed (Not Duplicated)
 
@@ -300,8 +354,11 @@ Each DAF module wraps or extends CoGames functionality:
 - Environment checks: All checks + error paths
 - Sweeps: Grid/random search, result analysis
 - Comparison: Statistical tests, HTML generation
-- Deployment: Packaging, validation, error handling
+- Deployment: Packaging, validation, submission, error handling
 - Orchestrators: Pipeline stage execution
+- Auth Integration: Login, token, status checking
+- Scoring Analysis: VOR, weighted scores, allocation
+- Policy Analysis: Discovery, architecture analysis
 
 ## Performance Considerations
 
@@ -341,6 +398,7 @@ Each DAF module wraps or extends CoGames functionality:
   - Training divergence detected → Stop training
 
 **Result Reporting**:
+
 - Accumulate all errors for comprehensive reporting
 - Never early-exit on first error if possible
 - Distinguish transient vs. permanent failures
@@ -389,4 +447,3 @@ Each DAF module wraps or extends CoGames functionality:
 3. **Document breaking changes**: Maintain backward compatibility
 4. **Version external dependencies**: Lock versions in requirements
 5. **Regular refactoring**: Simplify and reduce technical debt
-

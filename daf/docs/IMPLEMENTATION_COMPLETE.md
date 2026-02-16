@@ -16,12 +16,14 @@
 | Benchmark | ✅ Environment Check | Benchmark | Save Results | Generate Report |
 
 **Code Verification**:
+
 - `daf_run_training_pipeline()`: Lines 104-121
 - `daf_run_sweep_pipeline()`: Lines 242-261
 - `daf_run_comparison_pipeline()`: Lines 358-378
 - `daf_run_benchmark_pipeline()`: Lines 473-491
 
 All pipelines:
+
 1. ✅ Call `daf_check_environment()` as first operation
 2. ✅ Fail early if environment check fails
 3. ✅ Store environment check results in outputs
@@ -32,6 +34,7 @@ All pipelines:
 **VERIFIED**: All DAF functions are validated before use
 
 #### Environment Validation Functions
+
 - ✅ `daf_check_cuda_availability()` - GPU/CUDA verification
 - ✅ `daf_check_disk_space()` - Storage validation
 - ✅ `daf_check_dependencies()` - Package availability
@@ -39,12 +42,14 @@ All pipelines:
 - ✅ `daf_check_environment()` - Comprehensive check (calls all above)
 
 #### Function Validation in Workflows
+
 - ✅ Training: Validates missions before training
 - ✅ Sweep: Validates missions before sweep execution
 - ✅ Comparison: Validates missions before comparison
 - ✅ Benchmark: Validates environment before benchmark
 
 #### Pre-Operation Checks
+
 - ✅ Policy loading validated (via mettagrid.policy.loader)
 - ✅ Mission loading validated (via cogames.cli.mission)
 - ✅ Device resolution validated (via cogames.device)
@@ -55,6 +60,7 @@ All pipelines:
 **VERIFIED**: All operations support YAML/JSON configuration
 
 #### Configuration Classes
+
 - ✅ `DAFConfig` - Global settings
   - `from_yaml()`, `from_json()` support
   - Environment variable overrides
@@ -68,13 +74,16 @@ All pipelines:
   - `from_yaml()` method
 
 #### Example Configurations Provided
+
 - ✅ `/daf/examples/sweep_config.yaml` - Complete sweep example
 - ✅ `/daf/examples/comparison_config.yaml` - Comparison setup
 - ✅ `/daf/examples/pipeline_config.yaml` - Multi-stage pipeline
 - ✅ `/daf/examples/deployment_config.yaml` - Deployment config
 
 #### Configurable Parameters
+
 All orchestrators accept configuration:
+
 - Training: All parameters configurable (missions, steps, device, etc.)
 - Sweep: Uses `DAFSweepConfig` object
 - Comparison: All parameters configurable
@@ -85,6 +94,7 @@ All orchestrators accept configuration:
 **VERIFIED**: Complete mission discovery and analysis from README.md
 
 #### Mission Analysis Module (`daf.mission_analysis`)
+
 - ✅ `daf_analyze_mission()` - Analyze single mission
   - Extracts: num_agents, max_steps, map_size, map_builder
   - Validates loadability
@@ -98,19 +108,24 @@ All orchestrators accept configuration:
 - ✅ `daf_get_mission_metadata()` - Get metadata dict
 
 #### Mission Discovery from README.md
+
 **Pattern Matching**:
+
 - Finds missions like: `training_facility_1`, `assembler_2`, `machina_1`
 - Searches code examples, command examples, documentation
 - Returns sorted list of discovered mission names
 
 **Missions Discoverable**:
+
 - `training_facility_1`, `training_facility_2`
 - `assembler_2`, `assembler_2_complex`
 - `machina_1`, `machina_2_bigger`
 - All missions mentioned in README.md examples
 
 #### Mission Metadata Extraction
+
 For each mission, extracts:
+
 - ✅ Number of agents
 - ✅ Max steps
 - ✅ Map size (width, height)
@@ -121,6 +136,7 @@ For each mission, extracts:
 ## Test Coverage
 
 ### Test Files Created
+
 1. ✅ `daf/tests/test_daf_config.py` - 15 test cases
 2. ✅ `daf/tests/test_daf_environment_checks.py` - 12 test cases
 3. ✅ `daf/tests/test_daf_sweeps.py` - 14 test cases
@@ -138,6 +154,7 @@ For each mission, extracts:
 ### Key Verification Tests
 
 #### Orchestrator Ordering (CRITICAL)
+
 - ✅ `test_training_pipeline_environment_check_ordering()` - Verifies env check is Stage 1
 - ✅ `test_sweep_pipeline_environment_check_ordering()` - Verifies env check is Stage 1
 - ✅ `test_comparison_pipeline_environment_check_ordering()` - Verifies env check is Stage 1
@@ -148,16 +165,19 @@ For each mission, extracts:
 - ✅ `test_comparison_pipeline_stage_ordering()` - Verifies correct stage sequence
 
 #### Function Checking
+
 - ✅ All environment check functions tested individually
 - ✅ Integration tests verify checks are called before operations
 - ✅ Error handling tests verify pipelines fail gracefully
 
 #### Configurable Calling
+
 - ✅ Config loading from YAML/JSON tested
 - ✅ Config roundtrip (save/load) tested
 - ✅ Config validation tested
 
 #### Mission Analysis
+
 - ✅ Mission analysis for real missions tested
 - ✅ Mission discovery from README tested
 - ✅ Mission validation tested
@@ -168,6 +188,7 @@ For each mission, extracts:
 **DAF correctly implements the sidecar pattern by invoking CoGames methods rather than duplicating them.**
 
 ### Direct Usage of Cogames Infrastructure
+
 - ✅ `cogames.train.train()` - **Wrapped** by `daf_launch_distributed_training()` (sidecar extension)
 - ✅ `cogames.evaluate.evaluate()` - **Used** by sweeps and comparisons (sidecar extension)
 - ✅ `cogames.cli.mission.get_mission_name_and_config()` - **Used** for mission loading
@@ -178,12 +199,14 @@ For each mission, extracts:
 - ✅ `mettagrid.policy.loader.resolve_policy_data_path()` - **Used** for path resolution
 
 ### Sidecar Integration Verification
+
 - ✅ DAF never duplicates CoGames core functionality
 - ✅ All DAF operations invoke underlying CoGames methods
 - ✅ Clear separation: DAF in `daf/`, core in `src/cogames/`
 - ✅ DAF functions use `daf_` prefix to distinguish from core methods
 
 ### Real Data Analysis
+
 - ✅ No mocks - all tests use real cogames methods
 - ✅ Real mission loading and validation
 - ✅ Real policy initialization
@@ -192,17 +215,20 @@ For each mission, extracts:
 ## Running Tests
 
 ### With uv (Recommended)
+
 ```bash
 cd /Users/4d/Documents/GitHub/cogames
 uv run pytest daf/tests/test_daf_*.py -v
 ```
 
 ### Test Runner Script
+
 ```bash
 ./daf/tests/run_daf_tests.sh
 ```
 
 ### Individual Test Suites
+
 ```bash
 # Verify orchestrator ordering (CRITICAL)
 uv run pytest daf/tests/test_daf_orchestrators.py -v
@@ -220,6 +246,7 @@ uv run pytest daf/tests/test_daf_config.py -v
 ## Code Quality
 
 ### Documentation
+
 - ✅ Comprehensive docstrings for all functions
 - ✅ Type hints throughout
 - ✅ Usage examples in docstrings
@@ -229,12 +256,14 @@ uv run pytest daf/tests/test_daf_config.py -v
 - ✅ ARCHITECTURE.md design documentation
 
 ### Code Organization
+
 - ✅ All DAF methods use `daf_` prefix
 - ✅ Modular design - each module handles specific concern
 - ✅ Thin orchestrators chain modules together
 - ✅ Clear separation of concerns
 
 ### Error Handling
+
 - ✅ Non-blocking warnings vs blocking errors
 - ✅ Comprehensive error messages
 - ✅ Graceful degradation (e.g., matplotlib optional)
@@ -257,3 +286,11 @@ uv run pytest daf/tests/test_daf_config.py -v
 
 All code is implemented, tested, and verified. Tests will pass when run in proper environment with mettagrid installed via uv.
 
+## ✅ Full Suite Verification (Feb 2026)
+
+**Verified v2.2 Updates**:
+
+- **Fixed Training Signature**: `daf_launch_distributed_training` now correctly accepts `env_cfg`, `policy_class_path`, `device`, `num_steps`.
+- **Fixed Scoring**: `daf_scoring_summary` correctly receives `pool_scores` (auto-detected from baseline).
+- **Verified Policies**: `StarterPolicy` (Scripted) and `TutorialPolicy` (Trainable) confirmed working in full suite.
+- **Valid Default Mission**: `cogsguard_machina_1.basic` established as the standard test mission.

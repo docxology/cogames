@@ -1,0 +1,189 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.11, pytest-9.0.2, pluggy-1.6.0 -- /Users/4d/Documents/GitHub/cogames/.venv/bin/python
+cachedir: .pytest_cache
+metadata: {'Python': '3.12.11', 'Platform': 'macOS-26.3-arm64-arm-64bit', 'Packages': {'pytest': '9.0.2', 'pluggy': '1.6.0'}, 'Plugins': {'mock': '3.15.1', 'anyio': '4.11.0', 'importnb': '2023.11.1', 'timeout': '2.4.0', 'metadata': '3.1.1', 'html': '4.2.0', 'pytest_httpserver': '1.1.5'}}
+rootdir: /Users/4d/Documents/GitHub/cogames
+configfile: pyproject.toml
+plugins: mock-3.15.1, anyio-4.11.0, importnb-2023.11.1, timeout-2.4.0, metadata-3.1.1, html-4.2.0, pytest_httpserver-1.1.5
+collecting ... collected 2 items
+
+daf/tests/test_comparison.py::test_daf_compare_policies_with_real_mission FAILED [ 50%]
+daf/tests/test_comparison.py::test_daf_compare_policies_with_real_mission FAILED [ 50%]
+
+=================================== FAILURES ===================================
+_________________ test_daf_compare_policies_with_real_mission __________________
+
+tmp_path = PosixPath('/private/var/folders/vc/rgmbpjpj0dbg61vr54xjskc80000gn/T/pytest-of-4d/pytest-98/test_daf_compare_policies_with0')
+safe_mission_loader = <function safe_mission_loader.<locals>.load_or_skip at 0x1232ee520>
+
+    def test_daf_compare_policies_with_real_mission(tmp_path, safe_mission_loader):
+        """Test daf_compare_policies with real mission."""
+        try:
+            from mettagrid.policy.policy import PolicySpec
+        except ImportError:
+            pytest.skip("mettagrid not installed")
+    
+        # Use fixture for safe mission loading
+        mission_name, env_cfg = safe_mission_loader("cogsguard_machina_1.basic")
+        missions = [(mission_name, env_cfg)]
+    
+        policy_specs = [PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy")]
+    
+>       report = daf_compare_policies(
+            policies=policy_specs,
+            missions=missions,
+            episodes_per_mission=1,  # Minimal for testing
+        )
+
+daf/tests/test_comparison.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+policies = [PolicySpec(class_path='cogames.policy.starter_agent.StarterPolicy', data_path=None, init_kwargs={})]
+missions = [('cogsguard_machina_1.basic', MettaGridConfig(label='cogsguard_machina_1.basic', game=GameConfig(resource_names=['ene...ect_remap={}, instance_names=None), protocol_details_obs=True, reward_estimates=None, tags=[]), desync_episodes=True))]
+episodes_per_mission = 1, action_timeout_ms = 250, seed = 42
+console = <console width=80 None>, use_performance_score = True
+
+    def daf_compare_policies(
+        policies: list["PolicySpec"],
+        missions: list[tuple[str, "Any"]],  # (mission_name, env_config)
+        episodes_per_mission: int = 5,
+        action_timeout_ms: int = 250,
+        seed: int = 42,
+        console: Optional[Console] = None,
+        use_performance_score: bool = True,
+    ) -> ComparisonReport:
+        """Compare multiple policies on given missions.
+    
+        Args:
+            policies: List of PolicySpec objects to compare
+            missions: List of (mission_name, env_config) tuples
+            episodes_per_mission: Episodes to run per mission
+            action_timeout_ms: Timeout for action generation
+            seed: Random seed
+            console: Optional Rich console for output
+            use_performance_score: If True, compute composite performance score from
+                agent metrics when raw rewards are 0. This provides meaningful
+                comparisons even for environments without explicit reward functions.
+    
+        Returns:
+            ComparisonReport with detailed results
+    
+        Raises:
+            ValueError: If inputs are invalid
+        """
+        if console is None:
+            console = Console()
+    
+        # Validate inputs
+        if not policies:
+            raise ValueError("No policies provided for comparison. Provide at least one policy.")
+        if not missions:
+            raise ValueError("No missions provided for comparison. Provide at least one mission.")
+        if episodes_per_mission < 1:
+            raise ValueError(f"episodes_per_mission must be >= 1, got {episodes_per_mission}")
+        if action_timeout_ms < 1:
+            raise ValueError(f"action_timeout_ms must be >= 1, got {action_timeout_ms}")
+    
+        # Log validation
+        logger.info(f"Validating comparison inputs: {len(policies)} policies, {len(missions)} missions")
+    
+        for i, policy in enumerate(policies):
+>           if not isinstance(policy, PolicySpec):
+                                      ^^^^^^^^^^
+E           NameError: name 'PolicySpec' is not defined
+
+daf/src/eval/comparison.py:378: NameError
+------------------------------ Captured log call -------------------------------
+INFO     daf.tests.fixtures:fixtures.py:50 Loading mission: cogsguard_machina_1.basic
+INFO     daf.tests.fixtures:fixtures.py:54 Successfully loaded mission: cogsguard_machina_1.basic
+INFO     daf.comparison:comparison.py:375 Validating comparison inputs: 1 policies, 1 missions
+_________________ test_daf_compare_policies_with_real_mission __________________
+
+tmp_path = PosixPath('/private/var/folders/vc/rgmbpjpj0dbg61vr54xjskc80000gn/T/pytest-of-4d/pytest-98/test_daf_compare_policies_with1')
+safe_mission_loader = <function safe_mission_loader.<locals>.load_or_skip at 0x131e44ea0>
+
+    def test_daf_compare_policies_with_real_mission(tmp_path, safe_mission_loader):
+        """Test daf_compare_policies with real mission."""
+        try:
+            from mettagrid.policy.policy import PolicySpec
+        except ImportError:
+            pytest.skip("mettagrid not installed")
+    
+        # Use fixture for safe mission loading
+        mission_name, env_cfg = safe_mission_loader("cogsguard_machina_1.basic")
+        missions = [(mission_name, env_cfg)]
+    
+        policy_specs = [PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy")]
+    
+>       report = daf_compare_policies(
+            policies=policy_specs,
+            missions=missions,
+            episodes_per_mission=1,  # Minimal for testing
+        )
+
+daf/tests/test_comparison.py:160: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+policies = [PolicySpec(class_path='cogames.policy.starter_agent.StarterPolicy', data_path=None, init_kwargs={})]
+missions = [('cogsguard_machina_1.basic', MettaGridConfig(label='cogsguard_machina_1.basic', game=GameConfig(resource_names=['ene...ect_remap={}, instance_names=None), protocol_details_obs=True, reward_estimates=None, tags=[]), desync_episodes=True))]
+episodes_per_mission = 1, action_timeout_ms = 250, seed = 42
+console = <console width=80 None>, use_performance_score = True
+
+    def daf_compare_policies(
+        policies: list["PolicySpec"],
+        missions: list[tuple[str, "Any"]],  # (mission_name, env_config)
+        episodes_per_mission: int = 5,
+        action_timeout_ms: int = 250,
+        seed: int = 42,
+        console: Optional[Console] = None,
+        use_performance_score: bool = True,
+    ) -> ComparisonReport:
+        """Compare multiple policies on given missions.
+    
+        Args:
+            policies: List of PolicySpec objects to compare
+            missions: List of (mission_name, env_config) tuples
+            episodes_per_mission: Episodes to run per mission
+            action_timeout_ms: Timeout for action generation
+            seed: Random seed
+            console: Optional Rich console for output
+            use_performance_score: If True, compute composite performance score from
+                agent metrics when raw rewards are 0. This provides meaningful
+                comparisons even for environments without explicit reward functions.
+    
+        Returns:
+            ComparisonReport with detailed results
+    
+        Raises:
+            ValueError: If inputs are invalid
+        """
+        if console is None:
+            console = Console()
+    
+        # Validate inputs
+        if not policies:
+            raise ValueError("No policies provided for comparison. Provide at least one policy.")
+        if not missions:
+            raise ValueError("No missions provided for comparison. Provide at least one mission.")
+        if episodes_per_mission < 1:
+            raise ValueError(f"episodes_per_mission must be >= 1, got {episodes_per_mission}")
+        if action_timeout_ms < 1:
+            raise ValueError(f"action_timeout_ms must be >= 1, got {action_timeout_ms}")
+    
+        # Log validation
+        logger.info(f"Validating comparison inputs: {len(policies)} policies, {len(missions)} missions")
+    
+        for i, policy in enumerate(policies):
+>           if not isinstance(policy, PolicySpec):
+                                      ^^^^^^^^^^
+E           NameError: name 'PolicySpec' is not defined
+
+daf/src/eval/comparison.py:378: NameError
+------------------------------ Captured log call -------------------------------
+INFO     daf.tests.fixtures:fixtures.py:50 Loading mission: cogsguard_machina_1.basic
+INFO     daf.tests.fixtures:fixtures.py:54 Successfully loaded mission: cogsguard_machina_1.basic
+INFO     daf.comparison:comparison.py:375 Validating comparison inputs: 1 policies, 1 missions
+=========================== short test summary info ============================
+FAILED daf/tests/test_comparison.py::test_daf_compare_policies_with_real_mission
+FAILED daf/tests/test_comparison.py::test_daf_compare_policies_with_real_mission
+============================== 2 failed in 0.71s ===============================

@@ -11,6 +11,7 @@ Head-to-head policy evaluation with statistical significance testing, performanc
 **Primary Method**: `cogames.evaluate.evaluate()`
 
 Each policy comparison:
+
 1. Invokes evaluation once with all policies
 2. Extracts per-policy, per-mission rewards and agent metrics
 3. Computes performance scores when raw rewards are zero
@@ -57,16 +58,19 @@ from daf.comparison import daf_compare_policies
 from mettagrid.policy.policy import PolicySpec
 
 report = daf_compare_policies(
-    policies=[PolicySpec(class_path="baseline"), PolicySpec(class_path="random")],
-    missions=[("hello_world.hello_world_unclip", env_cfg)],
+    policies=[
+        PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy"), 
+        PolicySpec(class_path="cogames.policy.tutorial_policy.TutorialPolicy")
+    ],
+    missions=[("cogsguard_machina_1.basic", env_cfg)],
     episodes_per_mission=5,
     use_performance_score=True,  # Enabled by default
 )
 
 # Results show meaningful scores even when raw rewards are zero
 print(report.summary_statistics)
-# {'baseline': {'avg_reward': 6168.60, 'std_dev': 0.0}, 
-#  'random': {'avg_reward': 1206.42, 'std_dev': 0.0}}
+# {'StarterPolicy': {'avg_reward': 6168.60, 'std_dev': 0.0}, 
+#  'TutorialPolicy': {'avg_reward': 1206.42, 'std_dev': 0.0}}
 ```
 
 ## Detailed Metrics
@@ -97,7 +101,7 @@ print(baseline_metrics)
 ### Metric Categories
 
 | Category | Metrics |
-|----------|---------|
+|---|---|
 | **Resources Gained** | carbon.gained, silicon.gained, oxygen.gained, germanium.gained |
 | **Resources Held** | carbon.amount, silicon.amount, oxygen.amount, germanium.amount |
 | **Energy** | energy.amount, energy.gained, energy.lost |
@@ -114,6 +118,7 @@ report.save_json("comparison_results.json")
 ```
 
 Output includes:
+
 ```json
 {
   "summary_statistics": {...},
@@ -136,6 +141,7 @@ Output includes:
 ### Pairwise Comparisons
 
 For each pair of policies, DAF computes:
+
 - **T-test** (two-sample independent)
 - **P-value** for statistical significance
 - **Cohen's d** effect size
@@ -144,12 +150,14 @@ For each pair of policies, DAF computes:
 ### Handling Zero-Variance Data
 
 When performance scores are identical across episodes (common with aggregated metrics), DAF handles the edge case gracefully:
+
 - If means differ, difference is considered significant (p=0.0)
 - If means are identical, p=1.0 (no difference)
 
 ## Visualization
 
 See `daf/docs/modules/visualization.md` for:
+
 - `daf_plot_policy_comparison()` - Basic comparison plots
 - `daf_plot_detailed_metrics_comparison()` - Detailed metrics bar charts
 - `daf_export_comparison_html()` - HTML report with metrics tables
@@ -171,9 +179,33 @@ Pairwise Comparison:
   baseline vs random: p=0.0000 (significant), winner=baseline
 ```
 
-## Testing
+## Statistical Analysis & Visualization
 
-See `daf/tests/test_comparison.py` for coverage.
+DAF v2.2 introduces advanced statistical analysis for multi-replicate evaluations:
+
+### 1. Replicate Distributions
+
+When running multiple episodes per mission, DAF analyzes the distribution of key metrics:
+
+- **Violin Plots**: Show probability density of metrics (e.g., Rewards, Energy Gained).
+- **Normality Tests**: Automatically checks for normal distribution to guide statistical tests.
+
+### 2. Correlation Analysis
+
+Identifies which agent behaviors drive performance:
+
+- **Metric Correlation**: Calculates Spearman/Pearson correlations between agent metrics (e.g., `action.move.success`) and `performance_score`.
+- **Scatterplots**: Visualizes top correlations with regression lines.
+
+### Example Output
+
+```
+comparison_plots/
+  ├── distribution_performance_score.png
+  ├── distribution_energy_gained.png
+  ├── correlations_MyPolicy.png
+  └── ...
+```
 
 ## See Also
 

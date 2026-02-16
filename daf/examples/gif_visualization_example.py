@@ -83,7 +83,7 @@ def generate_gifs(
     cell_size: int = 16,
 ) -> list[Path]:
     """Generate GIFs from replay files."""
-    from daf.src.gif_generator import generate_gif_from_replay
+    from daf.src.viz.gif_generator import generate_gif_from_replay
     
     console.print(f"\n[bold cyan]Generating GIFs...[/bold cyan]")
     
@@ -116,7 +116,7 @@ def generate_frames(
     cell_size: int = 16,
 ) -> dict[Path, list[Path]]:
     """Generate individual frames from replays."""
-    from daf.src.gif_generator import generate_frames_only
+    from daf.src.viz.gif_generator import generate_frames_only
     
     console.print(f"\n[bold cyan]Generating frames...[/bold cyan]")
     

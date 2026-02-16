@@ -8,6 +8,22 @@ Provides:
 - Output directory management
 """
 
+# Pre-import torch with faulthandler disabled to prevent SIGABRT from
+# torch's C extension conflicting with pytest's signal handlers on
+# macOS ARM + Python 3.13. Once cached in sys.modules, subsequent
+# imports are safe.
+import faulthandler as _fh
+_fh_was_enabled = _fh.is_enabled()
+if _fh_was_enabled:
+    _fh.disable()
+try:
+    import torch  # noqa: F401
+except ImportError:
+    pass  # torch not installed — GPU tests will be skipped
+if _fh_was_enabled:
+    _fh.enable()
+del _fh, _fh_was_enabled
+
 import pytest
 import logging
 from pathlib import Path
@@ -39,6 +55,10 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers",
         "performance: marks tests as performance benchmarks",
+    )
+    config.addinivalue_line(
+        "markers",
+        "auth: marks tests requiring authentication",
     )
 
 
@@ -200,12 +220,31 @@ def assert_performance():
 
 @pytest.fixture
 def mission_names():
-    """Provide common test mission names."""
+    """Provide common test mission names using real CogsGuard sites."""
     return [
-        "training_facility_1",
-        "assembler_2",
-        "extractor_hub_30",
-        "hello_world_easy_hearts",
+        "cogsguard_machina_1",
+        "cogsguard_arena",
+        "training_facility.open_world",
+        "hello_world",
+    ]
+
+
+@pytest.fixture
+def cogsguard_missions():
+    """Provide CogsGuard-specific mission names."""
+    return [
+        "cogsguard_machina_1",
+        "cogsguard_arena",
+    ]
+
+
+@pytest.fixture
+def variant_names():
+    """Provide common variant names for testing."""
+    return [
+        "dark_side",
+        "energized",
+        "dense",
     ]
 
 

@@ -190,3 +190,7 @@ class StarterPolicy(MultiAgentPolicy):
                 agent_id=agent_id,
             )
         return self._agent_policies[agent_id]
+
+    @property
+    def unwrapped(self):
+        return self

@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-import torch
+
 
 from daf.src.environment_checks import (
     EnvironmentCheckResult,
@@ -57,11 +57,13 @@ def test_environment_check_result_summary():
 
 
 def test_daf_check_cuda_availability():
-    """Test CUDA availability check."""
+    """Test GPU availability check (CUDA on Linux, MPS on macOS)."""
     result = daf_check_cuda_availability()
 
     assert isinstance(result, EnvironmentCheckResult)
-    assert "CUDA Available" in result.checks or "CUDA Backend" in result.checks
+    # On macOS the backward-compat alias routes to MPS checks
+    gpu_checks = {"CUDA Available", "CUDA Backend", "MPS Available", "MPS Backend"}
+    assert gpu_checks & set(result.checks), f"Expected GPU checks, got: {result.checks}"
 
     # If CUDA available, should have device info
     if result.checks.get("CUDA Available", False):
@@ -114,8 +116,9 @@ def test_daf_get_recommended_device():
     """Test recommended device resolution."""
     device = daf_get_recommended_device()
 
+    import torch
     assert isinstance(device, torch.device)
-    assert device.type in ("cpu", "cuda")
+    assert device.type in ("cpu", "cuda", "mps")
 
 
 def test_daf_check_environment_all_checks(tmp_path):

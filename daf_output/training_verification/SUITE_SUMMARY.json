@@ -1,0 +1,31 @@
+{
+  "timestamp": "2026-02-16T11:50:40.773426",
+  "elapsed_seconds": 16.890805959701538,
+  "output_dir": "daf_output/training_verification",
+  "auth": {
+    "status": "skipped",
+    "authenticated": false,
+    "reason": "'bool' object has no attribute 'get'"
+  },
+  "comparison": {
+    "status": "failed",
+    "error": "No module named 'pandas'"
+  },
+  "sweeps": [],
+  "training": {
+    "status": "failed",
+    "error": "Policy cogames.policy.starter_agent.StarterPolicy must be trainable (network() returned None)"
+  },
+  "gif": {
+    "status": "skipped"
+  },
+  "scoring": {
+    "status": "skipped",
+    "reason": "comparison_failed"
+  },
+  "dashboard": {
+    "status": "success",
+    "output_dir": "daf_output/training_verification/dashboard",
+    "files_generated": 1
+  }
+}

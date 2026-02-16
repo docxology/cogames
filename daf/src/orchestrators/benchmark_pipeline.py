@@ -112,7 +112,7 @@ def benchmark_pipeline(
 
     # Stage 2: Benchmark
     try:
-        from daf.src.comparison import daf_compare_policies
+        from daf.src.eval.comparison import daf_compare_policies
 
         benchmark_results = daf_compare_policies(
             policies=policy_specs,

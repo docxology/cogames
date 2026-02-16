@@ -24,7 +24,7 @@ Run real CoGames evaluations with comprehensive visualizations:
 ./daf/scripts/run_full_suite.sh
 
 # Custom policies and missions
-./daf/scripts/run_full_suite.sh --policies lstm baseline random --missions training_facility.harvest
+./daf/scripts/run_full_suite.sh --policies cogames.policy.starter_agent.StarterPolicy cogames.policy.tutorial_policy.TutorialPolicy --missions cogsguard_machina_1.basic
 
 # Skip hyperparameter sweep
 ./daf/scripts/run_full_suite.sh --quick --no-sweep
@@ -51,7 +51,7 @@ name, env_cfg, _ = get_mission("training_facility.harvest")
 
 # Compare policies
 report = daf_compare_policies(
-    policies=[PolicySpec(class_path="baseline"), PolicySpec(class_path="random")],
+    policies=[PolicySpec(class_path="cogames.policy.starter_agent.StarterPolicy"), PolicySpec(class_path="cogames.policy.tutorial_policy.TutorialPolicy")],
     missions=[(name, env_cfg)],
     episodes_per_mission=5,
 )
@@ -65,8 +65,8 @@ from daf.src.config import DAFSweepConfig
 
 cfg = DAFSweepConfig(
     name="my_sweep",
-    policy_class_path="baseline",
-    missions=["training_facility.harvest"],
+    policy_class_path="cogames.policy.starter_agent.StarterPolicy",
+    missions=["cogsguard_machina_1.basic"],
     strategy="grid",
     search_space={"learning_rate": [0.001, 0.01]},
     episodes_per_trial=3,
@@ -101,6 +101,7 @@ python3 -c "from cogames.cogs_vs_clips.missions import MISSIONS; [print(m.full_n
 ```
 
 Common missions:
+
 - `training_facility.harvest`
 - `training_facility.open_world`
 - `hello_world.hello_world_unclip`
@@ -110,10 +111,9 @@ Common missions:
 
 | Policy | Description |
 |--------|-------------|
-| `baseline` | Scripted coordination agent |
-| `random` | Random action selection |
-| `lstm` | LSTM-based neural policy |
-| `stateless` | Feedforward neural network |
+| `cogames.policy.starter_agent.StarterPolicy` | Scripted coordination agent (Default) |
+| `cogames.policy.tutorial_policy.TutorialPolicy` | Simple trainable policy |
+| `cogames.policy.random_agent.RandomPolicy` | Random action selection |
 
 ## Workflow: Develop → Evaluate → Compare
 
@@ -128,13 +128,13 @@ class MyPolicy(MultiAgentPolicy):
             actions[i] = self.compute_action(observations[i])
 ```
 
-2. **Evaluate** against baselines:
+1. **Evaluate** against baselines:
 
 ```bash
 ./daf/scripts/run_full_suite.sh --policies mypackage.MyPolicy baseline --quick
 ```
 
-3. **Compare** with statistical analysis:
+1. **Compare** with statistical analysis:
 
 Open `daf_output/full_suite/suite_*/comparisons/report.html`
 

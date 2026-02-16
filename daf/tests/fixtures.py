@@ -36,7 +36,7 @@ def mission_loader():
         """Load a mission safely with detailed error messages.
         
         Args:
-            mission_name: Name of mission to load (e.g., 'training_facility_1')
+            mission_name: Name of mission to load (e.g., 'cogsguard_machina_1')
             
         Returns:
             Tuple of (mission_name, env_config)
@@ -45,16 +45,14 @@ def mission_loader():
             MissionLoadingError: If mission cannot be loaded
         """
         try:
-            from cogames.cli.mission import get_mission_name_and_config
-            from typer import Context
+            from cogames.cli.mission import get_mission
 
             logger.info(f"Loading mission: {mission_name}")
 
-            ctx = Context(lambda: None)
-            _, env_cfg, _ = get_mission_name_and_config(ctx, mission_name)
+            name, env_cfg, _ = get_mission(mission_name)
 
-            logger.info(f"Successfully loaded mission: {mission_name}")
-            return mission_name, env_cfg
+            logger.info(f"Successfully loaded mission: {name}")
+            return name, env_cfg
 
         except ImportError as e:
             raise MissionLoadingError(f"Failed to import mission utilities: {e}") from e

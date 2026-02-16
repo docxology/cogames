@@ -8,14 +8,16 @@ Extends CoGames device resolution with additional environment validation.
 
 from __future__ import annotations
 
+import faulthandler
 import importlib
 import shutil
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from rich.console import Console
 
-import torch
+if TYPE_CHECKING:
+    import torch
 
 # Check for optional dependencies
 try:
@@ -175,6 +177,30 @@ def _check_mps_availability(result: EnvironmentCheckResult, console: Console) ->
         Updated EnvironmentCheckResult
     """
     try:
+        # Guard against torch SIGABRT on macOS ARM + Python 3.13 + pytest
+        # Torch's C extension initialization conflicts with pytest's signal handlers
+        import signal
+        _fh_enabled = faulthandler.is_enabled()
+        if _fh_enabled:
+            faulthandler.disable()
+        # Save and temporarily reset SIGALRM handler (pytest-timeout uses it)
+        _old_alrm = None
+        if hasattr(signal, 'SIGALRM'):
+            try:
+                _old_alrm = signal.getsignal(signal.SIGALRM)
+                signal.signal(signal.SIGALRM, signal.SIG_DFL)
+            except (OSError, ValueError):
+                _old_alrm = None
+        try:
+            import torch
+        finally:
+            if _old_alrm is not None:
+                try:
+                    signal.signal(signal.SIGALRM, _old_alrm)
+                except (OSError, ValueError):
+                    pass
+            if _fh_enabled:
+                faulthandler.enable()
         mps_built = torch.backends.mps.is_built()
         mps_available = torch.backends.mps.is_available()
 
@@ -213,6 +239,28 @@ def _check_cuda_availability(result: EnvironmentCheckResult, console: Console) -
         Updated EnvironmentCheckResult
     """
     # Check if CUDA backend is available
+    # Guard against torch SIGABRT on macOS ARM + Python 3.13 + pytest
+    import signal
+    _fh_enabled = faulthandler.is_enabled()
+    if _fh_enabled:
+        faulthandler.disable()
+    _old_alrm = None
+    if hasattr(signal, 'SIGALRM'):
+        try:
+            _old_alrm = signal.getsignal(signal.SIGALRM)
+            signal.signal(signal.SIGALRM, signal.SIG_DFL)
+        except (OSError, ValueError):
+            _old_alrm = None
+    try:
+        import torch
+    finally:
+        if _old_alrm is not None:
+            try:
+                signal.signal(signal.SIGALRM, _old_alrm)
+            except (OSError, ValueError):
+                pass
+        if _fh_enabled:
+            faulthandler.enable()
     cuda_backend = getattr(torch.backends, "cuda", None)
     if cuda_backend is None or not cuda_backend.is_built():
         result.add_check("CUDA Backend", False, warning="CUDA backend not built into PyTorch")
@@ -348,6 +396,9 @@ def daf_check_dependencies(console: Optional[Console] = None) -> EnvironmentChec
         "rich": "rich",
         "mettagrid": "mettagrid",
         "pufferlib": "pufferlib",
+        "uvicorn": "uvicorn",
+        "fastapi": "fastapi",
+        "httpx": "httpx",
     }
 
     optional_packages = [
@@ -355,6 +406,7 @@ def daf_check_dependencies(console: Optional[Console] = None) -> EnvironmentChec
         "matplotlib",  # For visualization
         "scipy",  # For statistical tests
         "psutil",  # For system monitoring
+        "cogames",  # Core CoGames package
     ]
 
     # Check required packages
@@ -540,7 +592,7 @@ def daf_check_environment(
     return combined_result
 
 
-def daf_get_recommended_device(console: Optional[Console] = None) -> torch.device:
+def daf_get_recommended_device(console: Optional[Console] = None) -> "torch.device":
     """Get recommended device for training (CUDA/MPS if available, else CPU).
 
     Uses cogames.device.resolve_training_device pattern but with DAF-specific
@@ -568,4 +620,48 @@ def daf_get_recommended_device(console: Optional[Console] = None) -> torch.devic
         console.print("[yellow]ℹ Using CPU (no GPU acceleration)[/yellow]")
     
     return device
+
+
+def daf_check_auth(
+    server_url: str = "https://cogames.ai",
+    console: Optional[Console] = None,
+) -> EnvironmentCheckResult:
+    """Check if authentication token exists.
+
+    Args:
+        server_url: CoGames server URL
+        console: Optional Rich console for output
+
+    Returns:
+        EnvironmentCheckResult with auth status
+    """
+    if console is None:
+        console = Console()
+
+    result = EnvironmentCheckResult()
+
+    try:
+        from cogames.auth import CoGamesAuthenticator
+
+        authenticator = CoGamesAuthenticator(server_url=server_url)
+        has_token = authenticator.has_saved_token()
+
+        result.add_check(
+            "Auth Token",
+            has_token,
+            warning="No auth token found. Run 'cogames login' to authenticate." if not has_token else None,
+            info="Token present" if has_token else "No token",
+        )
+
+        if has_token:
+            console.print(f"[green]✓ Auth token found for {server_url}[/green]")
+        else:
+            console.print(f"[yellow]⚠ No auth token for {server_url}[/yellow]")
+
+    except ImportError:
+        result.add_check("Auth Token", False, warning="cogames.auth not available")
+    except Exception as e:
+        result.add_error("Auth Check", str(e))
+
+    return result
 

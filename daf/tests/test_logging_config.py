@@ -14,7 +14,7 @@ from pathlib import Path
 from datetime import datetime
 
 
-class TestLogFormatter(logging.Formatter):
+class DAFLogFormatter(logging.Formatter):
     """Custom formatter for test logs with timestamps and levels."""
     
     def format(self, record: logging.LogRecord) -> str:
@@ -72,7 +72,7 @@ def setup_test_logging(
     log_file = output_dir / f"test_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
     file_handler = logging.FileHandler(log_file, encoding="utf-8")
     file_handler.setLevel(logging.DEBUG)
-    file_formatter = TestLogFormatter()
+    file_formatter = DAFLogFormatter()
     file_handler.setFormatter(file_formatter)
     logger.addHandler(file_handler)
     
@@ -80,14 +80,14 @@ def setup_test_logging(
     if also_print:
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(log_level)
-        console_formatter = TestLogFormatter()
+        console_formatter = DAFLogFormatter()
         console_handler.setFormatter(console_formatter)
         logger.addHandler(console_handler)
     
     return logger
 
 
-class TestExecutionTracker:
+class DAFExecutionTracker:
     """Track test execution metrics and timings."""
     
     def __init__(self, log_dir: Path):
@@ -202,7 +202,7 @@ def create_test_log_file(
 if __name__ == "__main__":
     # Example usage
     log_dir = Path("./test_logs")
-    tracker = TestExecutionTracker(log_dir)
+    tracker = DAFExecutionTracker(log_dir)
     
     # Simulate test execution
     tracker.start_suite("test_config")

@@ -12,11 +12,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 
-from daf.src.output_manager import get_output_manager
-from daf.src.logging_config import create_daf_logger
+from daf.src.core.output_manager import get_output_manager
+from daf.src.core.logging_config import create_daf_logger
 
 
-class TestRunnerLogger:
+class DAFRunnerLogger:
     """Structured logging for test suite execution."""
 
     def __init__(self, output_base: str = "./daf_output", verbose: bool = False):
@@ -181,7 +181,7 @@ class TestRunnerLogger:
 
 if __name__ == "__main__":
     # Example usage
-    runner_logger = TestRunnerLogger(verbose=True)
+    runner_logger = DAFRunnerLogger(verbose=True)
     
     runner_logger.log_test_collection_phase(185, 100, 285)
     
